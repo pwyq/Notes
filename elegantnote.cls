@@ -41,7 +41,8 @@
 \DeclareVoidOption{founder}{\ekv{chinesefont=founder}}
 \DeclareVoidOption{nofont}{\ekv{chinesefont=nofont}}
 
-\DeclareStringOption[numbers]{cite}
+% \DeclareStringOption[numbers]{cite}
+\DeclareStringOption[authoryear]{cite}
 \DeclareVoidOption{numbers}{\ekv{cite=numbers}}
 \DeclareVoidOption{authoryear}{\ekv{cite=authoryear}}
 \DeclareVoidOption{super}{\ekv{cite=super}}
@@ -419,11 +420,11 @@
 \def\@maketitle{%
   \color{ecolor}
   \null
-  \vskip 2em%
+  \vskip 4em%
   \begin{center}%
     \let \footnote \thanks{%
       \LARGE\bfseries \@title \par}%
-    \vskip 1.5em {%
+    \vskip 35em {%
       \large
       \lineskip .5em%
       \begin{tabular}[t]{c}%

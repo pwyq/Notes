@@ -1047,6 +1047,25 @@ Gradient descent works on \textbf{convex functions}, while gradient ascent works
 \item The function which represents the relationship between the variables is known
 \end{itemize}
 
+
+\paragraph{Loss/Cost/Objective function}
+
+\begin{itemize}
+\item \textbf{Loss function} is usually a function defined on a data point, prediction and label, and measures the penalty. For example: square loss in linear regression, hinge loss in SVM, 01 loss in theoretical analysis
+\item \textbf{Cost function} is usually more general. It might be a sum of loss functions over all training set plus some model complexity penalty. For example: MSE and SVM cost function
+\item \textbf{Objective function} is the most general term for any function that you optimize during training. For example, a probability of generating training set in maximum likelihood approach is a well defined objective function, but it is not a loss function nor cost function
+\end{itemize}
+
+We may say that, a loss function is a part of cost function which is a type of an objective function.
+
+From wikipedia, in mathematical optimization and decision theory, a loss function or cost function (sometimes also called an error function) is a function that maps an event or values of one or more variables onto a real number intuitively representing some "cost" associated with the event. An optimization problem seeks to minimize a loss function. An objective function is either a loss function or its opposite (in specific domains, variously called a reward function, a profit function, a utility function, a fitness function, etc.), in which case it is to be maximized.
+
+\paragraph{Surrogate vs. Approximation}
+
+I think surrogate and approximation can be used interchangeably.
+
+Surrogate loss function is used when the original loss function is inconvenient for calculation.
+
 \bibliography{references.bib}
 
 \end{document}
