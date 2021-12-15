@@ -866,7 +866,7 @@ If there are ties in policy improvement steps, each maximizing action can be giv
 
 \subsection{Policy Iteration}
 
-It is trivial to see that we can ultimately reach an optimal policy through iterative improving policies and value functions.
+It is trivial to see that we can ultimately reach an optimal policy through iterative improving policies and value functions \footnote{In large-scale reinforcement learning problems, it is typically impractical to run either of these steps to convergence, and instead the value function and policy are optimized jointly. By Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor}.
 
 \begin{definition}
 policy iteration, the way of finding an optimal policy.
@@ -1065,6 +1065,7 @@ From wikipedia, in mathematical optimization and decision theory, a loss functio
 I think surrogate and approximation can be used interchangeably.
 
 Surrogate loss function is used when the original loss function is inconvenient for calculation.
+
 
 \bibliography{references.bib}
 

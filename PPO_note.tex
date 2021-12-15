@@ -11,6 +11,7 @@
 \usepackage[toc,page,title]{appendix}
 \usepackage{hyperref}
 
+\setlength{\parindent}{0pt}
 
 \DeclareMathOperator*{\E}{\mathbb{E}}
 \DeclareMathOperator*{\1}{\mathbbm{1}}
@@ -32,12 +33,12 @@
 
 Since some parts are not addressed directly from the literature, the explanations in this note are the best of my understanding.
 
-\section{Background}
+\section{Introduction}
 
 In normal policy gradient, training can be unstable due to sparse reward and sampled target, causing dramatic changes on the policy; this eventually collapses performance.
-To enhance training stability, we want to limit the parameter updates that would change the policy too much at one step.
+To enhance training stability, we want to limit the parameter updates that would change the policy too much at one step\footnote{In supervised learning, it will be corrected on the next update. In RL, step too far results in terrible policy and new data will be collected in this policy, therefore cannot be self-corrected.}.
 With this goal, True Region Policy Optimization (TRPO) \cite{schulman2017trust} was introduced.
-TRPO delimit the KL-divergence with a constraint. More specifically, TRPO updates policies by taking the largest step possible to improve performance while satisfying the constraint on how close the new and old policies are allowed to be.
+TRPO delimit the KL-divergence with a constraint. More specifically, TRPO updates policies by taking the largest step possible to improve performance while satisfying the constraint on how close the new and old policies are allowed to be \footnote{Trust Region is a more advanced \textit{step-sizing} method than line search along gradient}.
 However, TRPO is complicated to implement and is computational-heavy (from the computation of second-order derivatives of KL-divergence). Proximal Policy Optimization (PPO) \cite{schulman2017proximal} simplifies it by using a \textit{clipped surrogate objective} while retaining similar constraints and similar performance.
 Instead of enforcing a hard constraint as in TRPO, PPO formalized the constraint as a penalty in the objective function.
 
@@ -117,7 +118,7 @@ p_2 & = \text{clip}(\text{ratio}, 1-\epsilon, 1+\epsilon)\cdot\text{advantage} =
 L^{CLIP}(\theta) & = min(p_1, p_2) = \hat{\E_t}[min(r_t(\theta)\hat{A_t},clip(r_t(\theta),1-\epsilon,1+\epsilon)\hat{A_t})]
 \end{align*}
 
-To illustrate why the minimum of the two functions is chosen, see Figure \ref{fig:mm_algo} below.
+Based on my understanding from \cite{ppocs294}, to illustrate why the minimum of the two functions is chosen, see Figure \ref{fig:mm_algo} below.
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=0.9\linewidth]{MM_lowerbound.jpeg}
@@ -127,7 +128,8 @@ To illustrate why the minimum of the two functions is chosen, see Figure \ref{fi
 Think of the red line as a true objective function, and the blue line as a local approximation.
 If we choose to maximize all the way, the approximation will go to infinity.
 If we take local approximation and subtract a penalty, we receive a lower bound on the true objective function.
-When we make progress on this pessimistic version of the objective, we are guaranteed to make progress and eventually converge on the true objective function \cite{ppocs294}. The idea behind this is Minorize-Maximization Algorithm.
+When we make progress on this pessimistic version of the objective, we are guaranteed to make progress and eventually converge on the true objective function . The idea behind this is Minorize-Maximization Algorithm.
+Alternatively by \cite{weng2018PG}, the minimum is chosen because we avoid increasing the policy update to extremes for better rewards.
 
 Policy loss correlates to how much the policy (process for deciding actions) is changing.
 The magnitude of this should decrease during a successful training session.
@@ -189,12 +191,19 @@ DeepMind paper provides a more detailed pseudocode than OpenAI. According to Dee
 In this algorithm, $KL_{target}$ is the desired change in the policy per iteration.
 The Actor maximizes $J_{PPO}$, and Critic minimizes $L_{BL}$.
 
+\section{PPO Improvement}
+
+In a later paper by \cite{hsu2020revisiting}, two common design choices in PPO are revisited, precisely (1) clipped probability ratio for policy regularization and (2) parameterize policy action space by continuous Gaussian or discrete softmax distribution. They first identified three failure modes in PPO and proposed replacements for these two designs.
+
+The failure modes are:
+\begin{itemize}
+\item On continuous action spaces, standard PPO is unstable when rewards vanish outside bounded support.
+\item On discrete action spaces with sparse high rewards, standard PPO often gets stuck at suboptimal actions.
+\item The policy is sensitive to initialization when there are locally optimal actions close to initialization.
+\end{itemize}
 
 
-
-
-
-
+Discretizing the action space or use Beta distribution helps avoid failure mode 1\&3 associated with Gaussian policy. Using KL regularization (same motivation as in TRPO) as an alternative surrogate model helps resolve failure mode 1\&2.
 
 
 
