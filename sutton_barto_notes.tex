@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
  \usepackage{subfigure}
+
 \DeclareMathOperator*{\E}{\mathbb{E}}
 \DeclareMathOperator*{\1}{\mathbbm{1}}
 \DeclareMathOperator*{\R}{\mathbbm{R}}
@@ -13,14 +14,16 @@
 
 \title{Note: Reinforcement Learning - An Introduction}
 
-\author{Yanqing Wu}
-\institute{Viwistar Robotics}
+%\author{Yanqing Wu}
+%\institute{Viwistar Robotics}
 
 % \version{0.1.0}
-\date{\today}
+%\date{\today}
 
 \begin{document}
 \maketitle
+
+\setlength{\parindent}{0pt}
 
 \newpage
 
@@ -43,13 +46,13 @@ RL methods generally incorporate 3 aspects: sensation, action and goal.
 	\item Example: a description of a situation
 	\item Label: a specification of the correct action the system should take in a situation, which is often to identify a category to which the situation belongs
 	\item Object of Supervised Learning: for the system to extrapolate (generalize) its responses s.t. it acts correctly in unseen situations
-	\item Con: inadequate for learning from interaction, because it is (often) impractical to obtain examples of desired behavior that are both correct and representative of all the situations in which the agent has to act
+	\item Con: inadequate for learning from \textit{interaction}, because it is (often) impractical to obtain examples of desired behavior that are both correct and representative of all the situations in which the agent has to act
 \end{itemize}
 
 \begin{definition}
 \textbf{Unsupervised Learning} is about finding structure hidden in collections of unlabeled data.
 \end{definition}
-RL is trying to maximize a reward signal, while Unsupervised Learning is trying to find hidden structure
+RL is trying to maximize a reward signal, while Unsupervised Learning is trying to find hidden structure.
 
 Key feature 1: the exploration-exploitation dilemma is one of RL's challenges.
 Exploitation: to obtain reward from experienced.
@@ -82,7 +85,7 @@ On each timestep, the environment sends a single number (i.e. \textit{reward}) t
 
 The \textit{value} of a state is the total amount of reward an agent can expect to acumulate over the future, starting from that state.
 
-\textit{Rewards} determine the immediate desirability of states, \textit{values} determines the long-term desirability of states.
+!! \textit{Rewards} determine the immediate desirability of states, \textit{values} determines the long-term desirability of states.
 
 State Value function = Expected Return = Discounted sum of all rewards
 
@@ -90,7 +93,7 @@ State Value function = Expected Return = Discounted sum of all rewards
 \textbf{Model}, mimics the behavior of the environment.
 \end{definition}
 
-Models are used for \textit{planning}.
+The model defines the reward function and transition probabilities. Models are used for \textit{planning}.
 Model-based methods: use models and planning to solve RL problems.
 Model-free methods: explicitly trial-and-error learner (almost the opposite of planning).
 
@@ -100,7 +103,7 @@ Modern RL spans the spectrum from low-level, trial-and-error learning to high-le
 \subsection{An Extended Example: Tic-Tac-Toe}
 Minimax algorithm \cite{wiki_minimax} (from game theory).
 
-Classical optimization methods for sequential decision problems (e.g. dynamic programming). We need to estimate an approximate opponent model so to use dynamic programming; in such case, this is similar to RL methods.
+Classical optimization methods are for sequential decision problems (e.g. dynamic programming). We need to estimate an approximate opponent model so to use dynamic programming; in such case, this is similar to RL methods.
 
 During playing, we need to adjust the values of the states as to make more accuracte estimates of the probabilities of winning. The current value of the earlier state is updated to be closer to the value of the later state. This can be done by moving the earlier state's value a fraction of the way toward the value of the later state.
 
@@ -115,7 +118,7 @@ $\alpha$, step-size parameter, a small positive fraction, influences the rate of
 
 This update rule is an example of a temporal-difference (TD) learning method. TD means the changes are based on a difference between estimates at two consecutive times.
 
-If $\alpha$ is reduced properly over time, then this method converges (for any fixed opponent, it converges to the true probabilities of winning for each state); if $\alpha$ is not reduced to zero over time, then the agent ``also plays well against opponents that slowly change their way of playing'' (?). My understanding is that, there must have some changes, whether the parameter or the opponent model.
+If $\alpha$ is reduced properly over time, then this method converges (for any fixed opponent, it converges to the true probabilities of winning for each state); if $\alpha$ is not reduced to zero over time, then the agent ``also plays well against opponents that slowly change their way of playing'' (?). My understanding is that, there must have some slow changes, whether the parameter or the opponent model.
 
 \textbf{Evolutionary methods vs. Value Function methods.} Evolutionary methods ignores what happens during the games, and only the final outcome of each game is used (e.g. all of its behavior in a winning game is given credit). In contrast, value function methods evaluate individual states.
 
@@ -124,7 +127,7 @@ RL can be used when we have access to true state, or where some states are hidde
 
 The player need a model of the game to see the result states in response to actions. While model-free systems cannot know how their environments will change in response to actions.
 Model-free methods are building blocks for model-based methods.
-Sometimes, it is difficult to construct an accuract environment model, thus model-based methods cannot be used in such cases.
+Sometimes, it is difficult to construct an accurate environment model, thus model-based methods cannot be used in such cases.
 
 \subsection{Summary}
 
@@ -159,7 +162,7 @@ Algorithms in this part are described in simplest forms: the state space and act
 In this case, the methods can (often) find exact solutions (i.e. optimal value function and optimal policy).
 Algorithms in next part can only find approximate solutions but can be applied to much larger problems.
 
-\textbf{Bandit problems}, RL problem with only a single state. Chap. 2 describes general problem formulation (finite MDP) and its main ideas (including Bellman equations and value functions).
+\textbf{Bandit problems}, RL problem with only a single state. Chap 2 describes general problem formulation (finite MDP) and its main ideas (including Bellman equations and value functions).
 
 Three fundamental classes of methods for solving MDP problems: dynamic programming, Monte Carlo methods and TD learning.
 \begin{itemize}
@@ -168,6 +171,7 @@ Three fundamental classes of methods for solving MDP problems: dynamic programmi
 \item TD: no model needed and fully incremental, but are complex
 \end{itemize}
 
+\newpage
 \section{Chap. 2 Multi-armed Bandits}
 \begin{itemize}
 \item Evaluative: feedback depends solely on the taken action
@@ -178,38 +182,37 @@ Three fundamental classes of methods for solving MDP problems: dynamic programmi
 
 \subsection{A k-armed Bandit Problem}
 
-\textit{k-armed badit problem}:
+\textit{k-armed bandit problem}:
 You choose one option (action) from \textit{k} different options (actions). The probability of choosing each option (action) is stationary. For each choice, you receive a (probably distinct) numerical reward. Your objective is to maximize the expected total reward over \textit{j} option selections (time steps).
 
 For now, let us define that
-
-\textit{Value}: the expected/mean reward of a taken action.
-$A_t$: action selected on time step $t$
-$R_t$: corresponding reward of $A_t$
-$q_{*}(a)$: the (true) value of an arbitrary action $a$ (i.e. the expected reward given $a$ is selected) $$q_{*}(a) \doteq \E[R_t|A_t=a]$$
+\begin{itemize}
+\item \textit{Value}: the expected/mean reward of a taken action
+\item $A_t$: action selected on time step $t$
+\item $R_t$: corresponding reward of $A_t$
+\item $q_{*}(a)$:  $q_{*}(a) \doteq \E[R_t|A_t=a]$. The (true) value of an arbitrary action $a$ (i.e. the expected reward given $a$ is selected)
+\item $Q_t(a)$: the \textit{estimated} value of action $a$ at time step $t$.
+\end{itemize}
 
 If we know each action values, then solving the \textit{k}-armed bandit problem would be always select the action with highest $value$.
-If we don't know the action values, then we can estimate them. Let
-
-$Q_t(a)$: the \textit{estimated} value of action $a$ at time step $t$.
-
+If we don't know the action values, then we can estimate them.
 Our goal is to have $Q_t(a)$ to be as close to $q_*(a)$ as possible.
 
 \begin{definition}
-\textbf{Greedy actions}, action(s) with highest estimated value.
+\textbf{Greedy actions}, action(s) with highest \textbf{estimated} value.
 \end{definition}
 \textit{exploiting}: select greedy action(s).
-\textit{exploring}: select non-greedy action(s); this may improve the estimate value of non-greedy actions.
+\textit{exploring}: select non-greedy action(s). Exploration may improve the estimate value of non-greedy actions.
 
 \subsection{Action-value Methods}
 
 \begin{definition}
-\textbf{Action-value Methods}, a.k.a Q function, methods for estimating the values of actions, and using the estimates to select actions.
+\textbf{Action-value Methods}, or Q function, methods for estimating the values of actions, and using the estimates to select actions.
 \end{definition}
 
 `Q' means the \textbf{quality} of an action.
 
-Let see a simple action-value method: \textit{sample-average method}, averaging the received rewards.
+Let see a simple action-value method: \textit{sample-average method}, in which action-value is the mean reward for an action.
 
 $$ Q_t(a) \doteq \frac{\sum_{i=1}^{t-1}R_i \cdot \1_{A_{i=a}}}{\sum_{i=1}^{t-1}\1_{A_{i=a}}}$$
 
@@ -270,7 +273,7 @@ In previous section, the reward probability distribution is stationary (i.e. doe
 For nonstatoinary cases, let say we give more weight to recent rewards than to `long-past' rewards; for doing so, one popular way is to use a constant $\alpha$ (step size).
 
 Not all choices of $\alpha_n(a)$ guarantee convergence.
-In \textit{stochastic approximation theory}, two conditions required to assure convergence with probability 1:
+In \textit{stochastic approximation theory}, two conditions required to assure convergence ``with probability 1''\footnote{i.e. \textit{almost sure}. No distinction between `sure' and `almost sure' in finite sample space, but becomes important in infinite sample space. see \url{https://en.wikipedia.org/wiki/Almost_surely}}:
 
 $$ \sum_{n=1}^\infty \alpha_n(a) = \infty $$
 $$ \sum_{n=1}^\infty \alpha_n^2(a) < \infty $$
@@ -300,9 +303,9 @@ A_t \doteq \argmax_a \bigg[ Q_t(a) + c\sqrt{\frac{\text{ln }t}{N_t(a)}} \bigg]
 \]
 \end{definition}
 $N_t(a)$, denotes the number of times that action $a$ has been selected prior to time $t$. If $N_t(a)=0$, then $a$ is considered to be a maximizing action.
-$c$, $c > 0$ (confidence level) controlsthe degree of exploration
+$c$, $c > 0$ (confidence level) controls the degree of exploration
 
-The idea os UCB action selection is that the square-root term is a measure of the uncertainty/variance in the estimate of $a$'s value.
+The idea of UCB action selection is that the square-root term is a measure of the uncertainty/variance in the estimate of $a$'s value.
 Each time $a$ is selected, the uncertainty is (presumably) reduced as $N_t(a)$ increments.
 Each time a non-$a$ is selected, $t$ increments but $N_t(a)$ doesn't, thus the uncertainty estimate increases.
 All actions will eventually be selected, but actions with lower value estimates or that have been frequently selected, will be selected with decreasing frequency over time.
@@ -377,6 +380,7 @@ In general, the update computations are complex, but for \textit{conjugate prior
 One way to select the best action at each time step is based on posterior probability.
 This method, sometimes called posterior sampling or Thompson sampling.
 
+\newpage
 \section{Finite Markov Decision Processes}
 
 \begin{definition}
@@ -388,10 +392,10 @@ MDPs involves delayed reward. MDPs need to consider trade-off between immediate 
 
 In bandit problems, we estimated the value $q_{*}(a)$ of each action $a$.
 
-In MDPs, we estimate $q_{*}(s,a)$ (value of each action $a$ in each state $s$), or $v_{*}(s)$ (value of each state given optimal action selections.
+In MDPs, we estimate $q_{*}(s,a)$ (value of each action $a$ in each state $s$), or $v_{*}(s)$ (value of each state given optimal action selections).
 
 MDPs are an ideal form of the RL problem where precise theoretical statements can be made.
-Key elements of RL's mathematical structure are introduced, including returns, value functions, and Bellman equations.
+Key elements of RL's mathematical structure: returns, value functions, and Bellman equations.
 
 \subsection{The Agent-Environment Interface}
 
@@ -417,17 +421,23 @@ Following defines the \textit{dynamics} of the MDP.
 $$ p(s', r| s, a) \doteq P(S_t = s', R_t = r | S_{t-1} = s, A_{t-1} = a) $$
 $$ \sum_{s' \in \mathcal{S}} \sum_{r \in \mathcal{R}} p(s',r|s,a) = 1, \forall s \in \mathcal{S}, a \in \mathcal{A}(s) $$
 
-$p$ specifies a probability distribution for each choise of $s$ and $a$.
+$p$ specifies a probability distribution for each choice of $s$ and $a$.
 The probability of each possible value for $S_t$ and $R_t$ depends on the immediately preceding state and action, $S_{t-1}$ and $A_{t-1}$ (note not including earlier states and actions).
 
 \begin{definition}
-Markov property, a Markov state includes information about all aspects of the past agent-environment interaction, that make a difference for the future.
+Markov property\footnote{Markov property refers to the memoryless property of a stochastic process}, the future only depends on the current state, not the history.
 \end{definition}
 
 \begin{definition}
 state-transition probabilities,
 $$ p(s'|s,a) \doteq P(S_t=s'|S_{t-1}=s, A_{t-1}=a) = \sum_{r\in \mathcal{R}} p(s',r|s,a) $$
 \end{definition}
+We can express state transition probabilities in an Matrix as shown in Figure \ref{fig:state-trans-prob-eg}. Each row in the matrix represents the probability from moving from our original or starting state to any successor state. Sum of each row is equal to 1.
+\begin{figure}[h!]
+  \includegraphics[width=\linewidth]{state_transition_probability_example.jpg}
+  \caption{An example of state transition probability.}
+  \label{fig:state-trans-prob-eg}
+\end{figure}
 
 \begin{definition}
 expected rewards for state-action pairs
@@ -443,11 +453,11 @@ $$ r(s,a,s') \doteq \E [R_t | S_{t-1}=s, A_{t-1}=a, S_t=s'] = \sum_{r \in \mathc
 
 
 \paragraph{agent-environment}
-The agent-environment boundary represents the liit of the agent's absolute control, not of its knowledge. Anything that cannot be changed by the agent.
+The agent-environment boundary represents the lit of the agent's absolute control, not of its knowledge. Anything that cannot be changed by the agent.
 
 Any problem of learning goal-directed behavior can be reduced to 3 signals passing back and forth between an agent and its environment:
 \begin{itemize}
-\item action: the choicemade by the agent
+\item action: the choice made by the agent
 \item the basis on which the choice is made
 \item the agent's goal
 \end{itemize}
@@ -478,7 +488,7 @@ Robotic Arm (pick-and-place task)
  In RL, thr purpose/goal of the agent is to maximize \textit{cumulative reward in the long run}.
  It is important that the set-up rewards indicate what we truly want accomplished.
  In particular, rewards are not the place to tell/impart agent prior knowledge about \textit{how} to achieve our goal.
- For example, in a chess game, the agent should only be reward for winning, instead of achieving subgoals like taking oponent's pieces.
+ For example, in a chess game, the agent should only be reward for winning, instead of achieving subgoals like taking opponent's pieces.
  Better places for imparting this kind of prior knowledge in (1) initial policy; or (2) initial value function.
  
  The reward signal is a way of imparting to the agent \textit{what} you want achieved, not \textit{how} you want it achieved.
@@ -558,8 +568,11 @@ This way, we can have the same formula of $G_t$ for episodic and continuing task
 Value functions (either V or Q) are \textbf{always} conditional on some policy $\pi$. Sometimes in literature we leave off the $\pi$ or $*$ and just refer to $V$ and $Q$, because it’s implicit in the context, but ultimately, every value function is always with respect to some policies.
 
 \begin{definition}
-value functions of states, estimate how much expected return it is received for the agent to be in a given state
-value functions of state-action pairs, estimate how much expected return it is received to perform a given action in a given state
+There are two value functions:
+\begin{itemize}
+\item value functions of states, or V, estimate how much expected return it is received for the agent to be in a given state;
+\item value functions of state-action pairs, or Q, estimate how much expected return it is received to perform a given action in a given state.
+\end{itemize}
 \end{definition}
 
 \begin{definition}
@@ -616,7 +629,7 @@ Bellman equation for $v_\pi$:
 $$ v_\pi = \sum_a \pi(a|s) \sum_{s',r} p(s',r|s,a) [r+ \gamma v_\pi(s')] $$
 \end{definition}
 
-It expresses a relationsihp between the value of a state and the values of its successor states.
+It expresses a relationship between the value of a state and the values of its successor states.
 
 \begin{figure}[!h]
   \centering
@@ -626,7 +639,7 @@ It expresses a relationsihp between the value of a state and the values of its s
 \end{figure}
 Note that in backup diagram, the nodes do not necessarily represent distinct states (e.g. a state might be its own successor).
 
-The value function $v_\pi$ is the unique solution to its Bellman equation (??).
+The value function $v_\pi$ is the unique solution to its Bellman equation (??). My understanding is that since $v_\pi$ is the only solution, meaning that $v_\pi$ must converge to a point?
 
 \begin{definition}
 Bellman equation for $q_\pi$:
@@ -711,7 +724,7 @@ This solution relies on at least 3 assumptions:
 
 In RL, one typically has to settle for approximate solutions. Many RL methods can be taken as approximately solving the Bellman optimality equation.
 
-\paragraph{exercise} Consider the contining MDP shown, the only decision to be made is in the top state with two actions (left, right).
+\paragraph{Exercise} Consider the contining MDP shown, the only decision to be made is in the top state with two actions (left, right).
 Find optimal policy when $\gamma$ = 0.9.
 
 \begin{figure}[!h]
@@ -742,7 +755,7 @@ It is important to note that if we take `left' action in $s_0$, then policy $\pi
 
 \subsection{Optimality and Approximation}
 
-It is difficult to reach optimal solutions due to constraints from computational resource, memory. We can often approximate the optimal solutions.
+It is difficult to reach optimal solutions due to constraints from computational resource and memory. We can often approximate the optimal solutions.
 
 \subsection{Summary}
 
@@ -757,16 +770,17 @@ It is difficult to reach optimal solutions due to constraints from computational
 \item a finite MDP is an MDP with finite state sets, action sets and reward sets.
 \item \textit{return} is the function of future rewards that the agent seeks to maximize (in expected value)
 \item undiscounted formulation is appropriate for \textit{episodic tasks}
-\item discounted formulation is appropriate for \textit{tabular continuing tasks}
+\item discounted formulation is appropriate for \textit{\textbf{tabular} continuing tasks} (but not for approximate continuing tasks; see chap 10.3-4)
 \item \textit{value functions} $v_\pi$ (state) and $q_\pi$ (state-action pair) are the expected return from that state/state-action under policy $\pi$
 \item \textit{optimal value functions} $v_*$ and $q_*$ are the largest expected return by any policy
 \item A policy whose value functions are optimal is an optimal policy
-\item A MDP can have many optimal policies, but can have only one unique optimal value function ($v_*$ and $q_*$)
+\item !! A MDP can have many optimal policies, but can have only one unique optimal value function ($v_*$ and $q_*$)
 \item Any policy that is \textit{greedy} w.r.t $v_*$ and $q_*$ must be $\pi_*$
 \item The Bellman optimality equations are special consistency conditions that the optimal value functions must satisfy
 \item In RL most cases, their optimal solutions cannot be found but must be approximated in some way.
 \end{itemize}
 
+\newpage
 \section{Dynamic Programming}
 
 In RL, DP refers to a collection of algorithms that can be used to compute optimal policies $\pi_*$ given a perfect model of the environment as a Markov decision process (MDP).
