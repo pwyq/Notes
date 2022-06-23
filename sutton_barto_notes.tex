@@ -717,8 +717,14 @@ There are two value functions:
 \end{definition}
 
 \begin{definition}
-policy, $\pi(A_t=a|S_t=s)$, a mapping from states to probabilities of selecting each action
+policy, $\pi(A_t=a|S_t=s)$, a mapping from states to probabilities of selecting each action. In other words, policy is a distribution over actions for each possible state.
 \end{definition}
+\begin{itemize}
+\item deterministic policy: map each state to an action. $\pi(s)$. 
+\item stochastic policy: map each state to a distribution over all possible actions. $\pi(a|s)$
+\end{itemize}
+Valid policy can only depend on current state, not other things like time or previous state (if, for example, last action affect rewards heavily, then the last action must include in the states). 
+\newline
 
 Expectation of $R_{t+1}$ in terms of $\pi$ and the four-argument function $p$:
 \[
@@ -739,6 +745,8 @@ $$ q_\pi(s,a) \doteq \E_\pi [G_t | S_t = s, A_t = a] = \E_\pi [\sum_{k=0}^{\inft
 \end{definition}
 
 The main difference between $Q$ and $V$ then, is the $Q$-value lets you play a hypothetical of potentially taking a different action in the first time step than what the policy might prescribe and then following the policy from the state the agent winds up in.
+
+The value functions enable us to judge the quality of a policy.
 \newline
 
 Equation of $v_\pi$ in terms of $q_\pi$ and $\pi$:
@@ -770,7 +778,7 @@ Bellman equation for $v_\pi$:
 $$ v_\pi = \sum_a \pi(a|s) \sum_{s',r} p(s',r|s,a) [r+ \gamma v_\pi(s')] $$
 \end{definition}
 
-It expresses a relationship between the value of a state and the values of its successor states.
+It expresses a relationship between the value of a state and the values of its successor states. First, we expand the expected return as a sum over possible action choices made by the agent. Second, we expand over possible rewards and next states condition on state $s$ and action $a$. We break it down in this order because the action choice depends only on the current state, while the next state and reward depend only on the current state and action. 
 
 \begin{figure}[!h]
   \centering
@@ -804,6 +812,8 @@ $$ q_\pi(s,a) \doteq \E_\pi [G_t | S_t = s, A_t = a] = \sum_{s',r} p(s',r|s,a)[r
 \end{figure}
 The value of a state depends on the values of the actions possible in that state and on how likely each action is to be taken under the current policy.
 
+We can use the Bellman Equation to solve for a value function by writing a system of linear equations. However, we can only solve small MDPs directly, but Bellman Equations will factor into the solutions we see later for large MDPs.
+
 \subsection{Optimal Policies and Optimal Value Functions}
 
 Solving a RL means finding a policy that achieves a lot of reward over the long run.
@@ -813,6 +823,7 @@ optimal policy, $\pi_*$
 
 $$ \pi_* \geq \pi' \iff v_\pi(s) \geq v_{\pi'}(s), \quad \forall s \in \mathcal{S} $$
 \end{definition}
+An optimal policy is defined as the policy with the highest possible value function in all states. At least one (deterministic) optimal policy always exists, but there may be more than one. The exponential number of possible policies makes searching for the optimal policy by brute-force intractable.
 
 \begin{definition}
 optimal state-value function, $v_*$
@@ -833,7 +844,8 @@ $$ q_*(s,a) = \E [R_{t+1} + \gamma v_* (S_{t+1}) | S_t = s, A_t = a] $$
 \begin{definition}
 Bellman optimality equation for $v_*$,
 \begin{align*}
-v_*(s) & = \max_{a\in\mathcal{A}}(s) q_{\pi_*} (s,a) \\
+v_*(s) &= \sum_a \pi_* (a|s) q_{\pi_*} (s,a) \\
+& = \max_{a\in\mathcal{A}}(s) q_{\pi_*} (s,a) \\
 & = \max_a \E [R_{t+1} + \gamma v_* (S_{t+1}) | S_t = s, A_t = a] \\
 & = \max_a \sum_{s',r} p(s',r|s,a)[r+\gamma v_*(s')]
 \end{align*}
@@ -854,8 +866,13 @@ q_*(s,a) & = \E [R_{t+1} + \gamma \max_{a'} q_*(S_{t+1}, a') | S_t = s, A_t = a]
   \label{fig:MDP_optimal}
 \end{figure}
 
+$v_*$ is equal to the maximum of the term $\sum_{s',r} p(s',r|s,a)[r+\gamma v_*(s')]$ over all actions, while $\pi_*$ is the particular action achieves the maximum.
+\newline
+
 Explicitly solving the Bellman optimality equation provides one route to finding $\pi_*$, and thus to solving the RL problem.
-However, this solution is rarely useful. It needs an exhaustive search, looking ahead at all possibilities, computing their probabilities of occurrence and their desirabilities in terms of expected rewards.
+However, this solution is rarely useful.
+On one hand, $max_a$ is non-linear, so we cannot form linear equations as for Bellman equation.
+On the other hand, it needs an exhaustive search, looking ahead at all possibilities, computing their probabilities of occurrence and their desirabilities in terms of expected rewards.
 This solution relies on at least 3 assumptions:
 \begin{itemize}
 \item the dynamics of the environment are accurately known
@@ -863,36 +880,43 @@ This solution relies on at least 3 assumptions:
 \item the states have the Markov property
 \end{itemize}
 
-In RL, one typically has to settle for approximate solutions. Many RL methods can be taken as approximately solving the Bellman optimality equation.
+In RL, one typically has to settle for approximate solutions. Many RL methods can be taken as \textit{approximately} solving the Bellman optimality equation.
 
 \paragraph{Exercise} Consider the contining MDP shown, the only decision to be made is in the top state with two actions (left, right).
 Find optimal policy when $\gamma$ = 0.9.
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[]{ex3-22.PNG}
+  \includegraphics[width=0.2\linewidth]{ex3-22.PNG}
   \label{fig:ex3-22}
 \end{figure}
 
-Recall the definition of $v_\pi(s)$ and $q_\pi(s)$, we get
+\textbf{Solution}: Recall the definition of $v_\pi(s)$ and $q_\pi(s)$, we get
 
-\begin{itemize}
-\item Left Policy
+\begin{table}[h!]
+\begin{tabular}{p{0.4\textwidth}p{0.4\textwidth}}
+Left Policy & Right Policy \\
 \begin{itemize}
 \item $ v(s_0) = 1 + 0.9\cdot v(s_L) $
 \item $ v(s_L) = 0 + 0.9\cdot v(s_0) $
 \item $ v(s_R) = 2 + 0.9\cdot v(s_0) $
-\end{itemize}
-\item Right Policy
-\begin{itemize}
+\end{itemize} & \begin{itemize}
 \item $ v(s_0) = 0 + 0.9\cdot v(s_R) $
 \item $ v(s_L) = 0 + 0.9\cdot v(s_0) $
 \item $ v(s_R) = 2 + 0.9\cdot v(s_0) $
-\end{itemize}
-\end{itemize}
+\end{itemize}  
+\end{tabular}
+\end{table}
 Solving above we find that all state values of Right Policy is greater than all state values of Left Policy. Thus, `right' is the optimal policy for $\gamma$ = 0.9.
 
 It is important to note that if we take `left' action in $s_0$, then policy $\pi$ would never take us to state $s_R$ (same for `right' and $s_L$); however, due to the definition of $\pi_*$, we must evaluate the value function for all states, even ones that would not be visited under a policy we are evaluating.
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=\linewidth]{ex3-22-soln.png}
+  \label{fig:ex3-22-soln}
+\end{figure}
+To explain the geometry series, the left is 1, $\gamma\cdot$0, $\gamma^2\cdot$1, $\gamma^3\cdot$0 sequence and the right is 0, $\gamma\cdot$2, $\gamma^2\cdot$0, $\gamma^3\cdot$2 sequence. Taking discounted sum into consideration, we have the geometry series.
 
 \subsection{Optimality and Approximation}
 
@@ -922,6 +946,143 @@ It is difficult to reach optimal solutions due to constraints from computational
 \end{itemize}
 
 \newpage
+\subsection{Learning Objectives (UA RL MOOC)}
+1. Understand Markov Decision Processes (MDP)
+
+MDP adds associative perspective to bandit problem, the actions affect not only immediate reward but also future rewards.
+MDP consists of states, actions and rewards. MDP state must have Markov property (only present matters).
+
+2. Describe how the dynamics of an MDP are defined
+
+The dynamics of an MDP is the transition probability $p(s',r|s,a)$.
+
+3. Understand the graphical representation of a Markov Decision Process
+4. Explain how many diverse processes can be written in terms of the MDP framework
+
+From my understanding, almost all real world problems can be written in MDP framework. The issue is that reward definition sometimes may not be accurate, and states, actions may not be finite.
+
+5. Describe how rewards relate to the goal of an agent
+
+The reward is a way of imparting to the agent what you want to achieved, not how you want to achieved.
+
+6. Understand episodes and identify episodic tasks
+
+Episodes have finite trajectory length and must end in a terminal state. Episodes are independent of previous episode.
+Episodic task is task with episodes that ends in terminal state.
+
+7. Formulate returns for continuing tasks using discounting
+
+$$ G_t \doteq R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1} $$
+
+8. Describe how returns at successive time steps are related to each other
+
+$$ G_t = R_{t+1} + \gamma G_{t+1} $$
+
+9. Understand when to formalize a task as episodic or continuing
+
+When the tasks can be naturally broken into episodes (like chess game), the task is episodic; otherwise it is continuing task (like walking robot).
+
+10. Recognize that a policy is a distribution over actions for each possible state
+
+Policy is either a deterministic one (mapping from state to action) or a stochastic one (with probability distribution from state to actions).
+The deterministic policy can be considered as a 100\% probability distribution policy.
+
+11. Describe the similarities and differences between stochastic and deterministic policies
+
+see 10
+
+12. Generate examples of valid policies for a given MDP
+
+13. Describe the roles of state-value and action-value functions in reinforcement learning
+
+state-value gives the total expected return of a state following a policy, and action-value gives the total expected return of a state with an action then following a policy.
+The scalar values (those expected returns) helps us to choose optimal policies, which solves an RL problem.
+
+14. Describe the relationship between value functions and policies
+
+$$v_\pi (s) = \sum_a \pi (a|s) \sum_{s',r} p(s',r|s,a)[r+\gamma v_\pi(s')] $$
+
+15. Create examples of valid value functions for a given MDP
+
+16. Derive the Bellman equation for state-value functions
+
+\begin{align*}
+v_\pi(s) & \doteq \E_\pi[G_t | S_t = s]\\
+& = \E_\pi[R_{t+1} + \gamma G_{t+1} | S_t = s]\\
+& = \sum_a \pi(a|s) \sum_{s'}\sum_r p(s',r|s,a) [r+ \gamma \E_\pi[G_{t+1} | S_{t+1}=s']]\\
+& = \sum_a \pi(a|s) \sum_{s',r} p(s',r|s,a) [r+ \gamma v_\pi(s')]
+\end{align*}
+
+17. Derive the Bellman equation for action-value functions
+
+$$ q_\pi(s,a) = \sum_{s', r} p(s',r|s,a) [r+\gamma v_\pi(s')] $$
+
+18. Understand how Bellman equations relate current and future values
+
+We see that current values (in LHS) and future values (in RHS) of the Bellman equations.
+
+19. Use the Bellman equations to compute value functions
+
+20. Define an optimal policy
+
+$$ \pi_* \geq \pi' \iff v_\pi(s) \geq v_{\pi'}(s), \quad \forall s \in \mathcal{S} $$
+An optimal policy is defined as the policy with the highest possible value function in all states.
+
+21. Understand how a policy can be at least as good as every other policy in every state
+
+Let us say there is a policy $\pi_1$ which does well in some states, while policy $\pi_2$ does well in others. We could combine these policies into a third policy $\pi_3$, which always chooses actions according to whichever of policy $\pi_1$ and $\pi_2$ has the highest value in the current state. $\pi_3$ will necessarily have a value greater than or equal to both $\pi_1$ and $\pi_2$ in every state.
+
+22. Identify an optimal policy for given MDPs
+
+23. Derive the Bellman optimality equation for state-value functions
+
+\begin{align*}
+v_*(s) &= \sum_a \pi_* (a|s) q_{\pi_*} (s,a) \\
+& = \max_{a\in\mathcal{A}}(s) q_{\pi_*} (s,a) \\
+& = \max_a \E [R_{t+1} + \gamma v_* (S_{t+1}) | S_t = s, A_t = a] \\
+& = \max_a \sum_{s',r} p(s',r|s,a)[r+\gamma v_*(s')]
+\end{align*}
+
+24. Derive the Bellman optimality equation for action-value functions
+
+\begin{align*}
+q_*(s,a) & = \E [R_{t+1} + \gamma \max_{a'} q_*(S_{t+1}, a') | S_t = s, A_t = a] \\
+& = \sum_{s',r} p(s',r|s,a)[r+\gamma \max_{a'} q_*(s',a')]
+\end{align*}
+
+25. Understand how the Bellman optimality equations relate to the previously introduced Bellman equations
+
+26. Understand the connection between the optimal value function and optimal policies
+
+27. Verify the optimal value function for given MDPs
+
+28. Does adding a constant to all rewards change the set of optimal policies in episodic tasks? (Yes, adding a constant to all rewards changes the set of optimal policies.)
+Does adding a constant to all rewards change the set of optimal policies in continuing tasks? (No, as long as the relative differences between rewards remain the same, the set of optimal policies is the same.)
+
+\textbf{Explanation}: Let write $R_c$ for total reward with added constant $c$ of a policy as
+
+$$ R_c = \sum_{i=0}^K (r_i + c) \gamma^i = \sum_{i=0}^K r_i \gamma^i + \sum_{i=0}^K c \gamma^i $$
+
+So if we have two policies with the same total reward (w/o added $c$):
+
+$$ \sum_{i=0}^{K_1} r_i^1\gamma^i = \sum_{i=0}^{K_2} r_i^2 \gamma^i $$
+
+but with different lengths $K_1 \neq K_2$, the total reward with added constant will be different, because the second term in $R_c$ ($\sum_i^K c\gamma^i$) will be different.
+
+For example, consider two optimal policies, both generating the same cumulative reward of 10, but the first policy visits 4 states before it reaches a terminal state, while the second visitc only two states. The reward can be written as
+$$ 10 + 0 + 0 + 0 = 10 $$
+and
+$$0+10=10$$
+But when we add 100 to every reward:
+$$ 110+100+100+100=410$$
+and
+$$100+110=210$$
+Thus, now the first policy is better.
+
+In the continuous case, the episodes always have length $K=\inf$. Therefore, they always have the same lenght, and adding a constant does not change anything, because the second term in $R_c$ stays the same.
+
+
+\newpage
 \section{Dynamic Programming}
 
 In RL, DP refers to a collection of algorithms that can be used to compute optimal policies $\pi_*$ given a perfect model of the environment as a Markov decision process (MDP).
@@ -944,13 +1105,10 @@ q_*(s,a) & = \E [R_{t+1} + \gamma \max_{a'} q_*(S_{t+1},a') | S_t = s, A_t = a] 
 
 \subsection{Policy Evaluation (Prediction)}
 \begin{definition}
-policy evaluation, compute the state-value function $v_\pi$ for an arbitrary policy $\pi$
+policy evaluation (a.k.a prediction), compute the state-value function $v_\pi$ for an arbitrary policy $\pi$
 \end{definition}
 
-Policy evaluation is also called prediction problem.
-
 Recall that $\forall s \in \mathcal{S}$,
-
 \begin{align*}
 v_\pi(s) & \doteq \E_\pi [G_t | S_t = s] \\
 & = \E_\pi [R_{t+1} + \gamma G_{t+1} | S_t = s] \\
@@ -961,7 +1119,6 @@ v_\pi(s) & \doteq \E_\pi [G_t | S_t = s] \\
 If the environment's dynamics are completely known, then the last equation is a sysnteim of $|\mathcal{S}|$ simultaneous linear equations.
 For this case, iterative solution methods are most suitable. Consider a sequence of approximate value functions $v_0$, $v_1$, $v_2$, $\cdots$, each mapping $\mathcal{S^+}$ to $\R$.
 The initial approximation, $v_0$, is chosen arbitrarily, and each successive approximation is obtained by using the Bellman equation $v_\pi$ as an update rule ($\forall s$):
-
 \begin{align*}
 v_{k+1} & \doteq \E_\pi [R_{t+1} + \gamma v_k (S_{t+1}) | S_t = s] \\
 & = \sum_a \pi (a|s) \sum_{s',r} p(s',r|s,a)[r+\gamma v_k (s')]
@@ -988,14 +1145,12 @@ Loop:
 
 
 Policy evaluation of $q_\pi$:
-
 \begin{align*}
 q_\pi(s,a) & \doteq \E_\pi [G_t | S_t = s, A_t = a] \\
 & = \E_\pi [R_{t+1} + \gamma G_{t+1} | S_t = s, A_t = a] \\
 & = \E_\pi [R_{t+1} + \gamma \sum_{s',a'} q_\pi (s',a') | S_t = s, A_t = a] \\
 & = \sum_{s',r} p(s',r|s,a) [ r+ \gamma \sum_{a'} \pi(a'|s')q_\pi(s',a')]
 \end{align*}
-
 \begin{align*}
 q_{k+1}(s,a) & \doteq \E_\pi [R_{t+1} + \gamma G_{t+1} | S_t = s, A_t = a] \\
 & = \sum_{s',r} p(s',r|s,a)[r+\gamma \sum_{a'} \pi (a'|s')q_k(s',a')]
@@ -1012,6 +1167,13 @@ Then the policy $\pi'$ must be btter (or as good as) than $\pi$. That is, it mus
 
 $$ v_{\pi'}(s) \geq v_\pi (s) $$
 \end{definition}
+
+Greedy policy $\pi'(s)$:
+\begin{align*}
+\pi'(s) &\doteq \argmax_a q_\pi (s,a) \\
+&= \argmax_a \E [ R_{t+1} + \gamma v_\pi (S_{t+1}) | S_t = s, A_t = a] \\
+&= \argmax_a \sum_{s',r} p(s',r|s,a)[r+\gamma v_\pi(s')]
+\end{align*}
 
 \begin{definition}
 policy improvement, the process of making a new policy $\pi'$ that improves on an original policy $\pi$, by making it greedy w.r.t the value function of $\pi$.
@@ -1095,16 +1257,27 @@ $\varepsilon$-soft, the probability of selecting each action in each state, is a
 The policy evaluation of policy iteration requires multiple sweeps through the state set and convergence occurs only in the limit.
 We want to truncate policy evaluation without losing the convergence guarantees of policy iteration. One of the technique is value iteration.
 
-\begin{definition}
-value iteration, stop policy evaluation after one sweep (one update after each state).
+\begin{tcolorbox}[width=\textwidth,title={Value Iteration for estimating $\pi \approx \pi_*$}]
+1. Initialization
 
+$\quad\theta > 0$, $V(s) \forall s\in\mathcal{S}^+$, $V(term) = 0$
+
+2. Policy Evaluation
 \begin{align*}
-v_{k+1}(s) & \doteq max_a \E [R_{t+1}+\gamma v_k(S_{t+1})|S_t = s, A_t = a]\\
-& = max_a \sum_{s',r} p(s',r|s,a)[r+\gamma v_k (s')], \forall s \in \mathcal{S}
+&\text{Loop:}\\
+&\quad\Delta \leftarrow 0\\
+&\quad\text{Loop for each } s \in \mathcal{S}\\
+&\quad\quad v \leftarrow V(s)\\
+&\quad\quad V(s) \leftarrow \max_a \sum_{s',r} p(s',r|s,a)[r + \gamma V(s')]\\
+&\quad\quad \Delta \leftarrow \text{max}(\Delta, |v-V(s)|)\\
+&\text{until } \Delta < \theta
 \end{align*}
-\end{definition}
 
+3. Policy Improvement
 
+Output a deterministic policy, $\pi \approx \pi_*$, s.t.
+$$\pi(s) = \argmax_a\sum_{s',r}p(s',r|s,a)[r+\gamma V(s')]$$
+\end{tcolorbox}
 
 
 
@@ -1118,7 +1291,7 @@ v_{k+1}(s) & \doteq max_a \E [R_{t+1}+\gamma v_k(S_{t+1})|S_t = s, A_t = a]\\
 
 
 % Please add the following required packages to your document preamble:
-\begin{table}[]
+\begin{table}[h!]
 \begin{tabular}{@{}ll@{}}
 \toprule
 on-policy                       & off-policy                                                                                                                  \\ \midrule
@@ -1130,7 +1303,7 @@ Agent always follows own policy & \begin{tabular}[c]{@{}l@{}}Learning from exper
 
 % Please add the following required packages to your document preamble:
 % \usepackage{booktabs}
-\begin{table}[]
+\begin{table}[h!]
 \begin{tabular}{@{}lll@{}}
 \toprule
              & on-policy                                                                                                                                   & off-policy                                                                          \\ \midrule
@@ -1225,19 +1398,3 @@ Surrogate loss function is used when the original loss function is inconvenient 
 \bibliography{references.bib}
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
