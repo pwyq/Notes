@@ -1257,6 +1257,15 @@ $\varepsilon$-soft, the probability of selecting each action in each state, is a
 The policy evaluation of policy iteration requires multiple sweeps through the state set and convergence occurs only in the limit.
 We want to truncate policy evaluation without losing the convergence guarantees of policy iteration. One of the technique is value iteration.
 
+\begin{definition}
+value iteration, stop policy evaluation after one sweep (one update after each state).
+\begin{align*}
+v_{k+1}(s) & \doteq \max_a \E [R_{t+1}+\gamma v_k(S_{t+1})|S_t = s, A_t = a]\\
+& = \max_a \sum_{s',r} p(s',r|s,a)[r+\gamma v_k (s')],\quad \forall s \in \mathcal{S}
+\end{align*}
+\end{definition}
+For arbitrary $v_0$, the sequence ${v_k}$ converges to $v_*$. Note this equation is similar to the Bellman optimality equation of $v_*$ and the update rule of $v_{k+1}$.
+
 \begin{tcolorbox}[width=\textwidth,title={Value Iteration for estimating $\pi \approx \pi_*$}]
 1. Initialization
 
