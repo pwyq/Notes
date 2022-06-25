@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{subfigure}
+\usepackage{pythonhighlight}
 
 \usepackage{xcolor}
 \definecolor{shadecolor}{RGB}{150,150,150}
@@ -88,7 +89,7 @@ On each timestep, the environment sends a single number (i.e. \textit{reward}) t
 \textbf{Value function}, specifies what is good in the long run.
 \end{definition}
 
-The \textit{value} of a state is the total amount of reward an agent can expect to acumulate over the future, starting from that state.
+The \textit{value} of a state is the total amount of reward an agent can expect to accumulate over the future, starting from that state.
 
 !! \textit{Rewards} determine the immediate desirability of states, \textit{values} determines the long-term desirability of states.
 
@@ -110,7 +111,7 @@ Minimax algorithm \cite{wiki_minimax} (from game theory).
 
 Classical optimization methods are for sequential decision problems (e.g. dynamic programming). We need to estimate an approximate opponent model so to use dynamic programming; in such case, this is similar to RL methods.
 
-During playing, we need to adjust the values of the states as to make more accuracte estimates of the probabilities of winning. The current value of the earlier state is updated to be closer to the value of the later state. This can be done by moving the earlier state's value a fraction of the way toward the value of the later state.
+During playing, we need to adjust the values of the states as to make more accurate estimates of the probabilities of winning. The current value of the earlier state is updated to be closer to the value of the later state. This can be done by moving the earlier state's value a fraction of the way toward the value of the later state.
 
 \begin{equation}
 V(S_t) \leftarrow V(S_t) + \alpha[V(S_{t+1}) - V(S_t)]
@@ -300,7 +301,7 @@ $$ \sum_{n=1}^\infty \alpha_n^2(a) < \infty $$
 The 1st condition is required to guarantee that the steps are large enough to eventually overcome any initial conditions or random fluctuations.
 The 2nd condition is required to guarantee that the steps eventually become small enough to assure convergence.
 
-Therefore, in sample-average method, $\alpha_n(a) = \frac{1}{n}$ converages, but a constant step-size parameter $\alpha_n(a)=\alpha$ does not converge.
+Therefore, in sample-average method, $\alpha_n(a) = \frac{1}{n}$ converges, but a constant step-size parameter $\alpha_n(a)=\alpha$ does not converge.
 
 Note that sequences of $\alpha$ that meet the conditions often converge very slowly and often need considerable tunning.
 These sequences of $\alpha$ often used in theoretical work, and are seldom used in real-world application.
@@ -329,7 +330,7 @@ $c$, $c > 0$ (confidence level) controls the degree of exploration.
 \begin{figure}[!h]
   \centering
   \includegraphics[width=0.7\linewidth]{UCB_example.png}
-  \caption{UCB Example with 3 actions. The interval represetns the confidence level of the action. Larger confidence, smaller interval. Given the 3 actions, we select the one with highest upper bound. We update the interval based on received rewards.}
+  \caption{UCB Example with 3 actions. The interval represents the confidence level of the action. Larger confidence, smaller interval. Given the 3 actions, we select the one with highest upper bound. We update the interval based on received rewards.}
   \label{fig:UCB_example}
 \end{figure}
 
@@ -605,7 +606,7 @@ Any problem of learning goal-directed behavior can be reduced to 3 signals passi
 Bioreactor,
 
 \begin{itemize}
-\item actions (vector): target temperatures, target sitrring rates
+\item actions (vector): target temperatures, target stirring rates
 \item states (vector): sensory readings, ingredients input, target chemical
 \item rewards (number): production rate of useful chemical (target)
 \end{itemize}
@@ -624,7 +625,7 @@ Robotic Arm (pick-and-place task)
 
 
 \subsection{Goals and Rewards}
- In RL, thr purpose/goal of the agent is to maximize \textit{cumulative reward in the long run}.
+ In RL, the purpose/goal of the agent is to maximize \textit{cumulative reward in the long run}.
  It is important that the set-up rewards indicate what we truly want accomplished.
  In particular, rewards are not the place to tell/impart agent prior knowledge about \textit{how} to achieve our goal.
  For example, in a chess game, the agent should only be reward for winning, instead of achieving subgoals like taking opponent's pieces.
@@ -680,7 +681,7 @@ $$ G_t \doteq R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots = R_{t+1} + \
 
 \begin{example} pole-balancing
 \begin{itemize}
-\item terimnal state: if the pole falls past a given angle from vertical or if the cart runs off the track
+\item terminal state: if the pole falls past a given angle from vertical or if the cart runs off the track
 \item starting state: pole reset to vertical
 \item reward (episodic): +1 for each time step before falling
 \item reward (continuing): -1 on each falling, 0 for all other times
@@ -706,7 +707,7 @@ This way, we can have the same formula of $G_t$ for episodic and continuing task
 
 \subsection{Policies and Value Functions}
 
-Value functions (either V or Q) are \textbf{always} conditional on some policy $\pi$. Sometimes in literature we leave off the $\pi$ or $*$ and just refer to $V$ and $Q$, because it’s implicit in the context, but ultimately, every value function is always with respect to some policies.
+Value functions (either V or Q) are \textbf{always} conditional on some policy $\pi$. Sometimes in literature we leave off the $\pi$ or $*$ and just refer to $V$ and $Q$, because it is implicit in the context, but ultimately, every value function is always with respect to some policies.
 
 \begin{definition}
 There are two value functions:
@@ -928,7 +929,7 @@ It is difficult to reach optimal solutions due to constraints from computational
 \item RL is about learning from interaction how to behave in order to achieve a goal.
 \item RL \textit{agent} and its \textit{environment} interact over a sequence of discrete time steps.
 \item \textit{actions}: choices made by the agent, \textit{states}: the basis for making the choices, \textit{rewards}: basis for evaluating the choices.
-\item everything inside agent is known and controllable; environment is incompletely controllable, and are partialily known
+\item everything inside agent is known and controllable; environment is incompletely controllable, and are partially known
 \item a \textit{policy} is a stochastic rule that the agent selects actions as a function of states
 \item agent's objective is to maximize reward it receives in the long run
 \item when RL setup with agent, environment, states, actions, rewards, policy and formulated with well-defined transition probabilities it constitutes a Markov decision process (MDP)
@@ -1069,7 +1070,7 @@ $$ \sum_{i=0}^{K_1} r_i^1\gamma^i = \sum_{i=0}^{K_2} r_i^2 \gamma^i $$
 
 but with different lengths $K_1 \neq K_2$, the total reward with added constant will be different, because the second term in $R_c$ ($\sum_i^K c\gamma^i$) will be different.
 
-For example, consider two optimal policies, both generating the same cumulative reward of 10, but the first policy visits 4 states before it reaches a terminal state, while the second visitc only two states. The reward can be written as
+For example, consider two optimal policies, both generating the same cumulative reward of 10, but the first policy visits 4 states before it reaches a terminal state, while the second visits only two states. The reward can be written as
 $$ 10 + 0 + 0 + 0 = 10 $$
 and
 $$0+10=10$$
@@ -1116,7 +1117,7 @@ v_\pi(s) & \doteq \E_\pi [G_t | S_t = s] \\
 & = \sum_a \pi (a|s) \sum_{s',r} p(s',r|s,a) [r+\gamma v_\pi (s')]
 \end{align*}
 
-If the environment's dynamics are completely known, then the last equation is a sysnteim of $|\mathcal{S}|$ simultaneous linear equations.
+If the environment's dynamics are completely known, then the last equation is a system of $|\mathcal{S}|$ simultaneous linear equations.
 For this case, iterative solution methods are most suitable. Consider a sequence of approximate value functions $v_0$, $v_1$, $v_2$, $\cdots$, each mapping $\mathcal{S^+}$ to $\R$.
 The initial approximation, $v_0$, is chosen arbitrarily, and each successive approximation is obtained by using the Bellman equation $v_\pi$ as an update rule ($\forall s$):
 \begin{align*}
@@ -1124,7 +1125,7 @@ v_{k+1} & \doteq \E_\pi [R_{t+1} + \gamma v_k (S_{t+1}) | S_t = s] \\
 & = \sum_a \pi (a|s) \sum_{s',r} p(s',r|s,a)[r+\gamma v_k (s')]
 \end{align*}
 
-We see that $v_k$ = $v_\pi$ is a fixed point for this update rule as $k \rightarrow \infty$, $v_k$ converages to $v_\pi$. This algorithm is called \textit{iterative policy evaluation}.
+We see that $v_k$ = $v_\pi$ is a fixed point for this update rule as $k \rightarrow \infty$, $v_k$ converges to $v_\pi$. This algorithm is called \textit{iterative policy evaluation}.
 The update is called \textit{expected update}. It is called \textit{expected} because the updates are based on an expectation over all possible next states rather than on a sample next state.
 
 In this algorithm, we use one array and update values in place.
@@ -1156,14 +1157,40 @@ q_{k+1}(s,a) & \doteq \E_\pi [R_{t+1} + \gamma G_{t+1} | S_t = s, A_t = a] \\
 & = \sum_{s',r} p(s',r|s,a)[r+\gamma \sum_{a'} \pi (a'|s')q_k(s',a')]
 \end{align*}
 
+\subsubsection{Example Code}
+\begin{python}
+# V = np.zeros(len(env.S))
+# pi = np.ones((len(env.S), len(env.A))) / len(env.A)
+def evaluate_policy(env, V, pi, gamma, theta):
+    delta = float('inf')
+    while delta > theta:
+        delta = 0
+        for s in env.S:
+            v = V[s]
+            bellman_update(env, V, pi, s, gamma)
+            delta = max(delta, abs(v - V[s]))
+    return V
+
+def bellman_update(env, V, pi, s, gamma):
+    for state, pi_state in enumerate(pi):
+        if s != state:  # not the state we want, skip
+            continue
+        tmp = 0
+        for action, action_prob in enumerate(pi_state):
+            transitions = env.transitions(state, action)
+            for next_s, (reward, trans_prob) in enumerate(transitions):
+                tmp += action_prob * trans_prob * (reward + gamma * V[next_s])
+        V[s] = tmp
+\end{python}
+
 \subsection{Policy Improvement}
 
 \begin{definition}
-policy improvement theorem. Let $\pi$ and $\pi'$ be any pair of deterministic policies, where $\pi'$ is idential to $\pi$ except $\pi'(s) = a \neq \pi(s)$, s.t. $\forall s \in \mathcal{S}$,
+policy improvement theorem. Let $\pi$ and $\pi'$ be any pair of deterministic policies, where $\pi'$ is identical to $\pi$ except $\pi'(s) = a \neq \pi(s)$, s.t. $\forall s \in \mathcal{S}$,
 
 $$ q_\pi (s,\pi'(s)) \geq v_\pi(s) $$
 
-Then the policy $\pi'$ must be btter (or as good as) than $\pi$. That is, it must obtain greater or equal expected return from all states $s \in \mathcal{S}$
+Then the policy $\pi'$ must be better (or as good as) than $\pi$. That is, it must obtain greater or equal expected return from all states $s \in \mathcal{S}$
 
 $$ v_{\pi'}(s) \geq v_\pi (s) $$
 \end{definition}
@@ -1252,6 +1279,61 @@ $\quad Q(s,a) \in\R$ and $\pi(s) \in A(s)$ arbitrarily $\forall s \in \mathcal{S
 $\varepsilon$-soft, the probability of selecting each action in each state, is at least $\frac{\varepsilon}{A(s)}$
 \end{definition}
 
+\subsubsection{Example Code}
+\begin{python}
+def improve_policy(env, V, pi, gamma):
+    policy_stable = True
+    for s in env.S:
+        old = pi[s].copy()
+        q_greedify_policy(env, V, pi, s, gamma)
+        if not np.array_equal(pi[s], old):
+            policy_stable = False
+    return pi, policy_stable
+
+def policy_iteration(env, gamma, theta):
+    V = np.zeros(len(env.S))
+    pi = np.ones((len(env.S), len(env.A))) / len(env.A)
+    policy_stable = False
+    
+    while not policy_stable:
+        V = evaluate_policy(env, V, pi, gamma, theta)
+        pi, policy_stable = improve_policy(env, V, pi, gamma)
+    return V, pi
+    
+def q_greedify_policy(env, V, pi, s, gamma):
+    def argmax(_values):
+        """
+        Input:  (list) _values
+        Return: (int)  the index of the item with the highest value.
+        Breaks ties randomly.
+        """
+        top_value = float("-inf")
+        ties = []
+        for i in range(len(_values)):
+            if _values[i] > top_value:
+                ties = []
+                ties.append(i)
+                top_value = _values[i]
+            elif _values[i] == top_value:
+                ties.append(i)
+            else:
+                pass
+        return np.random.choice(ties)
+    for state, pi_state in enumerate(pi):
+        if s != state:
+            continue
+        # take the action that result in max action-value
+        q_values = []
+        for action, action_prob in enumerate(pi_state):
+            transitions = env.transitions(state, action)
+            tmp = 0
+            for next_s, (reward, trans_prob) in enumerate(transitions):
+                tmp += trans_prob * (reward + gamma * V[next_s])
+            q_values.append(tmp)
+        pi[state] = int(0)
+        pi[state][argmax(q_values)] = int(1)
+\end{python}
+
 \subsection{Value Iteration}
 
 The policy evaluation of policy iteration requires multiple sweeps through the state set and convergence occurs only in the limit.
@@ -1261,7 +1343,9 @@ We want to truncate policy evaluation without losing the convergence guarantees 
 value iteration, stop policy evaluation after one sweep (one update after each state).
 \begin{align*}
 v_{k+1}(s) & \doteq \max_a \E [R_{t+1}+\gamma v_k(S_{t+1})|S_t = s, A_t = a]\\
-& = \max_a \sum_{s',r} p(s',r|s,a)[r+\gamma v_k (s')],\quad \forall s \in \mathcal{S}
+& = \max_a \sum_{s',r} p(s',r|s,a)[r+\gamma v_k (s')],\quad \forall s \in \mathcal{S} \\
+q_{k+1}(s,a) & \doteq \E[R_{t+1} + \max_{a'} \gamma q_k (s', a')] \\
+& = \sum_{s',r} p(s',r|s,a)[r+\max_{a'} \gamma q_k (s',a')]
 \end{align*}
 \end{definition}
 For arbitrary $v_0$, the sequence ${v_k}$ converges to $v_*$. Note this equation is similar to the Bellman optimality equation of $v_*$ and the update rule of $v_{k+1}$.
@@ -1288,10 +1372,160 @@ Output a deterministic policy, $\pi \approx \pi_*$, s.t.
 $$\pi(s) = \argmax_a\sum_{s',r}p(s',r|s,a)[r+\gamma V(s')]$$
 \end{tcolorbox}
 
+One value iteration sweep combines one sweep of policy evaluation
+and one sweep of policy improvement. Faster convergence is often achieved by interposing
+multiple policy evaluation sweeps between each policy improvement sweep. In general,
+the entire class of truncated policy iteration algorithms can be thought of as sequences
+of sweeps, some of which use policy evaluation updates and some of which use value
+iteration updates.
 
+\subsubsection{Example Code}
+\begin{python}
+def value_iteration(env, gamma, theta):
+    V = np.zeros(len(env.S))
+    while True:
+        delta = 0
+        for s in env.S:
+            v = V[s]
+            bellman_optimality_update(env, V, s, gamma)
+            delta = max(delta, abs(v - V[s]))
+        if delta < theta:
+            break
+    pi = np.ones((len(env.S), len(env.A))) / len(env.A)
+    for s in env.S:
+        q_greedify_policy(env, V, pi, s, gamma)
+    return V, pi
 
+def value_iteration2(env, gamma, theta):
+    V = np.zeros(len(env.S))
+    pi = np.ones((len(env.S), len(env.A))) / len(env.A)
+    while True:
+        delta = 0
+        for s in env.S:
+            v = V[s]
+            q_greedify_policy(env, V, pi, s, gamma)
+            bellman_update(env, V, pi, s, gamma)
+            delta = max(delta, abs(v - V[s]))
+        if delta < theta:
+            break
+    return V, pi
 
+def bellman_optimality_update(env, V, s, gamma):
+    for state, pi_state in enumerate(pi):
+        if s != state:  # not the state we want, skip
+            continue
 
+        state_values = [] # we later take the largest state value
+        for action, action_prob in enumerate(pi_state):
+            transitions = env.transitions(state, action)
+            tmp = 0
+            for next_s, (reward, trans_prob) in enumerate(transitions):
+                tmp += trans_prob * (reward + gamma * V[next_s])
+            state_values.append(tmp)
+        V[state] = max(state_values)
+\end{python}
+
+\subsection{Asynchronous Dynamic Programming}
+
+Systematic DP is intractable to large state set problems; it would take a lot of time for a single sweep.
+
+Asynchronous DP are in-place iterative DP that updates state value in random order. Async DP still needs to update all state values for convergence. We can also intermix policy iteration and value iteration, as for systematic DP, to produce an async truncated policy iteration.
+
+The idea of async DP, and likewise in other RL algorithms, is that we \textit{focus} the DP updates onto those states that are most relevant to the agent. In this way, we can speed up the process, but not less computation.
+
+Sweepless DP algorithm is beyond the scope of this book.
+
+\subsection{Generalized Policy Iteration}
+
+\begin{definition}
+\textbf{Generalized Policy Iteration (GPI)}, the idea of letting policy evaluation and policy improvement processes interact, independent of the granularity of the two processes.
+\end{definition}
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.5\linewidth]{GPI.png}
+  \label{fig:GPI}
+\end{figure}
+
+For GPI examples, the value iteration only uses one sweep of policy evaluation, and async DP does sweep the in order. Almost all RL methods are GPI.
+
+Monte Carlo sampling method, an alternative to learn a value function, estimates each state value independently by averaging large number of returns.
+Brute-force search is an alternative for finding $\pi_*$ by computing with every $\pi$.
+Bootstrapping, the process of using the value estimates of successor states to improve current value estimate. This is more efficient (estimating value collectively) than Monte Carlo method (estimating each value independently).
+
+\subsection{Efficiency of Dynamic Programming}
+
+DP, in the worst case, the time takes to find an optimal solution is polynomial in the number of states and actions (even though the total number of deterministic policies is $|\mathcal{A}|^{|\mathcal{S}|}$. DP is better at large state spaces than competing methods (e.g. direct search, linear programming).
+
+\subsection{Summary}
+
+\begin{itemize}
+\item DP requires complete and accurate model of the environment
+\item Policy evaluation: iterative computation of the value function for a given policy
+\item Policy improvement: the computation of an improved policy given the value function for that policy
+\item Two most popular DP methods: policy iteration and value iteration, by combining policy evaluation and policy improvement. These two can solve finite MDPs given complete knowledge of the MDP
+\item Classical DP: sweep whole state set, performing expected update on each state. The update is based on all possible successor states and their probabilities of occurring.
+\item Generalized Policy Iteration (GPI): interacting processes (policy evaluation and policy improvement) revolving around an approximate policy and an approximate value function
+\item Async DP: unlike classical/systematic DP, it update states in random order.
+\item \textbf{bootstrapping}: update estimates on the basis of other estimates (English definition of bootstrap: you pull yourself up by your boot-straps, meaning you achieved success by your own efforts.)
+\end{itemize}
+
+\newpage
+\subsection{Learning Objectives (UA RL MOOC)}
+
+Only policies greedy with respect to the optimal value function are guaranteed to be optimal.
+
+1. Understand the distinction between policy evaluation and control
+
+policy evaluation computes the state value for $\pi$, while control (policy improvement in literature) computes improved policy given the value function.
+
+2. Explain the setting in which dynamic programming can be applied, as well as its limitations
+
+DP can be applied in relatively large MDPs. Its limitations include (1) requiring complete model of the MDP.
+
+3. Outline the iterative policy evaluation algorithm for estimating state values under a given policy
+
+see chap 4.1
+
+4. Apply iterative policy evaluation to compute value functions
+
+5. Understand the policy improvement theorem
+
+policy improvement theorem: the computation of an improved policy given the value function for that policy.
+
+6. Use a value function for a policy to produce a better policy for a given MDP
+7. Outline the policy iteration algorithm for finding the optimal policy
+
+see chap 4.3
+
+8. Understand “the dance of policy and value”
+
+The PE and PI happens (mostly) alternatively, and reach optimal state value function and optimal policy eventually.
+
+9. Apply policy iteration to compute optimal policies and optimal value functions
+
+10. Understand the framework of generalized policy iteration
+
+PE + PI. There can be multiple updates or no update for a state in each iteration. All state must be visited once.
+
+11. Outline value iteration, an important example of generalized policy iteration
+
+see chap 4.4
+
+12. Understand the distinction between synchronous and asynchronous dynamic programming methods
+
+sync DP is the systematic DP, which updates all states in order. async DP updates state in any order, which makes it for faster convergence.
+
+13. Describe brute force search as an alternative method for searching for an optimal policy
+
+Brute-force search takes $|A|^{|S|}$ time. It compute for every combination of state-action mappings (policies).
+
+14. Describe Monte Carlo as an alternative method for learning a value function
+
+MC estimates state value by averaging large number of returns.
+
+15. Understand the advantage of Dynamic programming and “bootstrapping” over these alternative strategies for finding the optimal policy
+
+DP is fast and boostrapping uses more states' info during estimation than the other alternatives, which is more efficient.
 
 
 
@@ -1375,7 +1609,7 @@ Gradient descent works on \textbf{convex functions}, while gradient ascent works
 \begin{itemize}
 \item Differential is a subfield of calculus that refers to infinitesimal difference in some varying quantity
 \item Differential represents an equation that contains a function and one or more derivatives of that function
-\item The function which represents the relationsihp between the dependent and the independent variables is unknown
+\item The function which represents the relationship between the dependent and the independent variables is unknown
 \end{itemize}
 
 \begin{itemize}
