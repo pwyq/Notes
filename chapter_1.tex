@@ -1,0 +1,152 @@
+\documentclass[sutton_barto_notes.tex]{subfiles}
+
+\begin{document}
+
+\newpage
+
+\section{Chap 1: Introduction}
+\subsection{Reinforcement Learning}
+
+RL is learning what to do, so as to maximize a numerical reward signal.
+
+RL means taking optimal action with \textbf{long term} results or \textbf{cumulative rewards} in mind.
+
+Two most important distinguishing features of RL: trial-and-error search and delayed reward.
+
+RL methods generally incorporate 3 aspects: sensation, action and goal.
+
+\begin{definition}
+\textbf{Supervised Learning} is learning from a training set of labeled examples provided by a knowledgable external supervisor.
+\end{definition}
+
+\begin{itemize}
+	\item Example: a description of a situation
+	\item Label: a specification of the correct action the system should take in a situation, which is often to identify a category to which the situation belongs
+	\item Object of Supervised Learning: for the system to extrapolate (generalize) its responses s.t. it acts correctly in unseen situations
+	\item Con: inadequate for learning from \textit{interaction}, because it is (often) impractical to obtain examples of desired behavior that are both correct and representative of all the situations in which the agent has to act
+\end{itemize}
+
+\begin{definition}
+\textbf{Unsupervised Learning} is about finding structure hidden in collections of unlabeled data.
+\end{definition}
+RL is trying to maximize a reward signal, while Unsupervised Learning is trying to find hidden structure.
+
+Key feature 1: the exploration-exploitation dilemma is one of RL's challenges.
+Exploitation: to obtain reward from experienced.
+Exploration: to find better actions.
+
+Key feature 2: RL explicitly considers the whole problem of a goal-directed agent interacting with an uncertain environment.
+
+\subsection{Examples}
+\subsection{Elements of RL}
+
+Four main subelements of a RL system: a \textit{policy}, a \textit{reward signal}, a \textit{value function}, and a \textit{model} of the environment.
+
+\begin{definition}
+\textbf{Policy}, defines the learning agent's way of behaving at a given time.
+\end{definition}
+
+A policy is a mapping from perceived states of the environment, to actions to be taken, when in those states.
+A policy may be a simple function or a lookup table, or complex computation (e.g. a search process).
+Policies may be stochastic, specifying probabilities for each action.
+
+\begin{definition}
+\textbf{Reward signal}, defines the goal of a RL problem.
+\end{definition}
+
+On each timestep, the environment sends a single number (i.e. \textit{reward}) to the RL agent. The agent's only objective is to maximize the total reward it receives over the long run.
+
+\begin{definition}
+\textbf{Value function}, specifies what is good in the long run.
+\end{definition}
+
+The \textit{value} of a state is the total amount of reward an agent can expect to accumulate over the future, starting from that state.
+
+!! \textit{Rewards} determine the immediate desirability of states, \textit{values} determines the long-term desirability of states.
+
+State Value function = Expected Return = Discounted sum of all rewards
+
+\begin{definition}
+\textbf{Model}, mimics the behavior of the environment.
+\end{definition}
+
+The model defines the reward function and transition probabilities. Models are used for \textit{planning}.
+Model-based methods: use models and planning to solve RL problems.
+Model-free methods: explicitly trial-and-error learner (almost the opposite of planning).
+
+Modern RL spans the spectrum from low-level, trial-and-error learning to high-level, deliberative planning.
+
+\subsection{Limitations and Scope}
+\subsection{An Extended Example: Tic-Tac-Toe}
+Minimax algorithm \cite{wiki_minimax} (from game theory).
+
+Classical optimization methods are for sequential decision problems (e.g. dynamic programming). We need to estimate an approximate opponent model so to use dynamic programming; in such case, this is similar to RL methods.
+
+During playing, we need to adjust the values of the states as to make more accurate estimates of the probabilities of winning. The current value of the earlier state is updated to be closer to the value of the later state. This can be done by moving the earlier state's value a fraction of the way toward the value of the later state.
+
+\begin{equation}
+V(S_t) \leftarrow V(S_t) + \alpha[V(S_{t+1}) - V(S_t)]
+\end{equation}
+
+$S_t$, the state before a move.
+$S_{t+1}$, the state after the move.
+$V(S_t)$, the update to the estimated value of $S_t$.
+$\alpha$, step-size parameter, a small positive fraction, influences the rate of learning.
+
+This update rule is an example of a temporal-difference (TD) learning method. TD means the changes are based on a difference between estimates at two consecutive times.
+
+If $\alpha$ is reduced properly over time, then this method converges (for any fixed opponent, it converges to the true probabilities of winning for each state); if $\alpha$ is not reduced to zero over time, then the agent ``also plays well against opponents that slowly change their way of playing'' (?). My understanding is that, there must have some slow changes, whether the parameter or the opponent model.
+
+\textbf{Evolutionary methods vs. Value Function methods.} Evolutionary methods ignores what happens during the games, and only the final outcome of each game is used (e.g. all of its behavior in a winning game is given credit). In contrast, value function methods evaluate individual states.
+
+In this example, learning started with no prior knowledge except the rules of the game. In reality, prior information can be incorporated into RL in many ways for efficient learning.
+RL can be used when we have access to true state, or where some states are hidden, or when different states appear to be the same to the learner.
+
+The player need a model of the game to see the result states in response to actions. While model-free systems cannot know how their environments will change in response to actions.
+Model-free methods are building blocks for model-based methods.
+Sometimes, it is difficult to construct an accurate environment model, thus model-based methods cannot be used in such cases.
+
+\subsection{Summary}
+
+RL is a computational approach to understanding and automating goal-directed learning and decision making.
+It is distinguished from other computational approaches by its emphasis on learning by an agent from direct \textbf{interaction} with its environment, without requiring exemplary supervision or complete models of the environment.
+
+RL uses the formal framework of Markov decision processes (MDP) to defined the interaction between a learning agent and its environment in terms of states, actions, and rewards.
+
+The concepts of value and value function are key to most of the RL methods in this book.
+The authors believe that value functions are critical for efficient search in policy space.
+The use of value functions distinguishes RL methods from evolutionary methods.
+
+\subsection{Early History of RL}
+
+Three threads: 
+1. learning by trial and error, originated in the psychology of animal learning. Time from 1850s to early 1980s' revival of RL;
+2. optimal control problem and its solution using value functions and dynamic programming. This thread did not involve learning;
+3. temporal-difference methods.
+These 3 threads came together in late 1980s.
+The TD and optimal control threads were fully brought together in 1989 with Chris Watkin's development of Q-learning.
+
+The essential idea of trial-and-error learning: `the drive to achieve some result from the environment, to control the environment toward desired ends and away from undesired ends.'
+
+TD learning methods are driven by the difference between temporally successive estimates of the same quantity.
+
+The authors developed a method for using TD learning + trial-and-error learning, known as the \textit{actor-critic architecture}.
+
+\newpage
+\textbf{Part I: Tabular Solution Methods}
+
+Algorithms in this part are described in simplest forms: the state space and action space are small enough for the approximate value functions to be represented as arrays/tables.
+In this case, the methods can (often) find exact solutions (i.e. optimal value function and optimal policy).
+Algorithms in next part can only find approximate solutions but can be applied to much larger problems.
+
+\textbf{Bandit problems}, RL problem with only a single state. Chap 2 describes general problem formulation (finite MDP) and its main ideas (including Bellman equations and value functions).
+
+Three fundamental classes of methods for solving MDP problems: dynamic programming, Monte Carlo methods and TD learning.
+\begin{itemize}
+\item DP: well developed, but require a complete and accurate model of the environment
+\item MC: no model needed, but not good for incremental computation
+\item TD: no model needed and fully incremental, but are complex
+\end{itemize}
+
+
+\end{document}
