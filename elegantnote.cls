@@ -424,7 +424,7 @@
   \begin{center}%
     \let \footnote \thanks{%
       \LARGE\bfseries \@title \par}%
-    \vskip 35em {%
+    \vskip 30em {%
       \large
       \lineskip .5em%
       \begin{tabular}[t]{c}%

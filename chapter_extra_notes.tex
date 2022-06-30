@@ -29,6 +29,16 @@ actor-critic & \begin{tabular}[c]{@{}l@{}}A3C\\ A2C\\ TRPO\\ PPO\end{tabular}   
 \end{tabular}
 \end{table}
 
+\subsection{argmax vs. max}
+
+$$ \argmax_x f(x) = f^{-1} { \max_x f(x) } $$
+
+$$ \max f(x) = f( \argmax f(x) ) $$
+
+$\argmax f(x)$ is the function \textbf{argument} $x$ at which the maximum of $f$ occurs, and $\max f(x)$ is the \textbf{maximum} value of $f$.
+
+For example, $f(x) = 100 - (x-6)^2$, then $\max_x f(x) = 100$ and $\argmax_x f(x) = 6$.
+
 
 \subsection{Gradient Descent vs. Gradient Ascent}
 
