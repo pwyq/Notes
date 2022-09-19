@@ -1,0 +1,122 @@
+\documentclass[sutton_barto_notes.tex]{subfiles}
+
+\begin{document}
+
+
+\newpage
+\section{Temporal-Difference Learning}
+
+TD combines some of the features of both MC and DP. TD does not require a model and can learn from interactions (like MC), and TD can bootstrap, thus learn online (without waiting till the end of episodes) (like DP).
+
+TD($\lambda$) unifies DP, MC, TD.
+
+Prediction problem = policy evaluation (i.e., estimating $v_\pi$ for a given $\pi$)
+
+Control problem = finding an optimal policy
+
+\subsection{TD Prediction}
+
+\begin{definition}
+\textbf{constant-$\alpha$ MC}:
+
+$$V(S_t) \leftarrow V(S_t) + \alpha \underbrace{[G_t - V(S_t)]}_\text{MC error} $$
+\end{definition}
+
+Unlike MC which has to wait until the end of an episode to update, TD only has to wait one time step.
+
+\begin{definition}
+\textbf{TD(0)}, or one-step TD:
+
+$$ V(S_t) \leftarrow V(S_t) + \alpha \underbrace{[R_{t+1} + \gamma V(S_{t+1}) - V(S_t)]}_\text{TD error}$$
+\end{definition}
+
+\begin{tcolorbox}[width=1.1\textwidth,title={Tabular TD(0) for estimating $v_\pi$}]
+Input: the policy $\pi$ to be evaluated
+
+Algorithm parameter: step size $\alpha \in (0, 1]$
+
+Init $V(s)$ $\forall s \in S+$, $V(term.) = 0$
+
+Loop for each episode:
+
+$\quad$Init $S$
+
+$\quad$Loop for each step of episode:
+
+$\quad\quad A \leftarrow$ action given by $\pi$ for $S$
+
+$\quad\quad$Take action $A$, observe $R$, $S'$
+
+$\quad\quad V(S) \leftarrow V(S) + \alpha[R + \gamma V(S') - V(S)]$
+
+$\quad\quad S \leftarrow S'$
+
+$\quad$until $S$ is terminal
+\end{tcolorbox}
+
+\begin{itemize}
+\item MC target is an estimate, because a sample return is needed for real expected return
+\item DP target is an estimate, because the next state value is unknown and the current estimate is used
+\item TD target is an estimate because (1) samples the expected values; (2) and uses current estimate $V$ instead of the true $v_\pi$
+\end{itemize}
+
+TD methods combine the sampling of MC with the bootstrapping of DP.
+TD and MC updates are \textit{sample update} because they involve looking ahead to a sample successor state.
+
+\begin{itemize}
+\item sample update: based on a single sample sample successor
+\item expected update: a complete distribution of all possible successors
+\end{itemize}
+
+\begin{definition}
+\textbf{TD error}:
+$$\delta_t \doteq \underbrace{R_{t+1} + \gamma V(S_{t+1})}_\text{TD Target} - V(S_t)$$
+\end{definition}
+
+MC error can be written as a sum of TD errors (think of it this way, TD updates immediately at each time step, MC updates after an episode (which include a lot of timesteps)
+
+\begin{align*}
+\text{MC error} = G_t - V(S_t) &= \underbrace{R_{t+1}+\gamma G_{t+1}}_{G_t} - V(S_t) + \gamma V(S_{t+1}) - \gamma V(S_{t+1}) \\
+&= \delta_t + \gamma (G_{t+1} - V(S_{t+1})) \\
+&= \delta_t + \gamma \delta_{t+1} + \gamma^2 (G_{t+2} - V(S_{t+2})\\
+&= \sum_{k=t}^{T-1} \gamma^{k-t} \delta_k
+\end{align*}
+
+\subsection{Advantages of TD Prediction Methods}
+
+TD methods have an advantage over DP methods in that they do not require a model of the environment.
+
+TD methods over MC methods is that they are naturally implemented in an online, fully incremental fashion.
+
+\subsection{Optimality of TD(0)}
+
+\begin{definition}
+\textbf{batch updating}: updates are made only after processing each complete batch of training data.
+\end{definition}
+
+\begin{itemize}
+\item max-likelihood estimate: find the parameter value whose probability of generating the data is greatest
+\item certainty-equivalence estimate: equivalent to assuming that the estimate of the underlying process was known with certainty rather than being approximated
+\end{itemize}
+
+In batch form, TD(0) is faster than MC methods because it computes the true certainty-equivalence estimate.
+
+\subsection{Learning Objectives (UA RL MOOC)}
+
+Lesson 1: Introduction to Temporal Difference Learning
+
+1. Define temporal-difference learning
+
+2. Define the temporal-difference error
+
+3. Understand the TD(0) algorithm
+
+Lesson 2: Advantages of TD
+
+4. Understand the benefits of learning online with TD
+
+5. Identify key advantages of TD methods over Dynamic Programming and Monte Carlo methods
+
+6. Identify the empirical benefits of TD learning
+
+\end{document}

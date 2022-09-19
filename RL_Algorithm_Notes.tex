@@ -24,12 +24,13 @@
 
 \title{Study Note: Reinforcement Learning Algorithms}
 
-\author{Yanqing Wu\\[0.5cm]{Advisor: Prof. Hengshuai Yao}}
+\author{Yanqing Wu\\[0.5cm]{}}
 \institute{Viwistar Robotics}
 
 \begin{document}
 \maketitle
 
+\newpage
 \tableofcontents
 
 \newpage
@@ -99,6 +100,9 @@ An advantage of this separation is that the estimation policy may be determinist
 Hence, off-policy gives us better exploration and helps us use data samples more efficiently.
 
 Within off-policy methods, there are two types: Q learning and Q-based policy gradient (or Q-based actor critic) \cite{ytbcs287}.
+
+\subsection{Online learning vs. offline learning}
+Online learning means that you are doing it as the data comes in. Offline means that you have a static dataset.
 
 \subsection{Policy-based vs. Value-based}
 
@@ -456,6 +460,55 @@ An improvement on SAC formulates a constrained optimization problem: while maxim
 \end{itemize}
 \end{itemize}
 
+\newpage
+\subsection{DQN}
+
+\subsubsection{Summary}
+\begin{itemize}
+\item The first learning-based agent to achieve humna-level play at various games (Atari games)
+\item DQN combines RL and deep convolutional network.
+\item DQN uses DNN to approximate the optimal action-value function $Q(s,a)$
+\item The authors uses experience replay and iterative update to solve the unstablness that introduced by DNN in RL.
+\end{itemize}
+
+
+
+\subsubsection{Research Objective(s)}
+
+- what's the research objectives
+
+\subsubsection{Background / Problem Statement}
+
+- the background of the research \& problem statement: what's the problem the author want to solve?
+
+\subsubsection{Method(s)}
+
+- methods proposed by the author
+- what's the algorithm? does it based on any previous results? if so, what are those?
+
+\subsubsection{Evaluation}
+
+- how do the authors evaluate their method?
+- what's the setup of experiment?
+- what's are interesting experiment data and/or result?
+- is there any problems?
+- what can you learn from?
+
+\subsubsection{Conclusion}
+
+- what are the conclusions?
+- what are the strong conclusions?
+- what are the weak conclusions? (those without clear evidence, and possible only mentioned in Discussion section)
+
+\subsubsection{Notes}
+
+- optional, notes not included in above list, but need to be documented
+
+\subsubsection{References}
+- optional, highly-related references
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -604,6 +657,52 @@ Consider an infinite sequence of returns with no beginning or end, and no clearl
 each time step is exactly the same as other in continuing settings. With discounting, every reward will appear exactly once in each position in some return. The $t$th reward $r_t$ is undiscounted in $(t-1)$th reward, discounted once in $(t-2)$ return and discounted 999 times in the $(t-1000)$th return. The weight on the $t$th reward is thus $1+\gamma + \gamma^2 + \cdots = \frac{1}{1-\gamma}$ \footnote{Mathematical proof is shown in page 254 on \cite{Sutton1998}.}.
 Since all states are the same, the average of the returns will just be $\frac{r(\pi)}{1-\gamma}$.
 The discount rate $\gamma$ thus has no effect on the continuous problem formulation.
+
+
+\newpage
+\section{Template of Paper Note}
+
+\subsection{Title}
+\subsubsection{Summary}
+
+- summarize the paper in your own words
+- this will be the first point when you review
+
+\subsubsection{Research Objective(s)}
+
+- what's the research objectives
+
+\subsubsection{Background / Problem Statement}
+
+- the background of the research \& problem statement: what's the problem the author want to solve?
+
+\subsubsection{Method(s)}
+
+- methods proposed by the author
+- what's the algorithm? does it based on any previous results? if so, what are those?
+
+\subsubsection{Evaluation}
+
+- how do the authors evaluate their method?
+- what's the setup of experiment?
+- what's are interesting experiment data and/or result?
+- is there any problems?
+- what can you learn from?
+
+\subsubsection{Conclusion}
+
+- what are the conclusions?
+- what are the strong conclusions?
+- what are the weak conclusions? (those without clear evidence, and possible only mentioned in Discussion section)
+
+\subsubsection{Notes}
+
+- optional, notes not included in above list, but need to be documented
+
+\subsubsection{References}
+- optional, highly-related references
+
+
 
 \end{appendices}
 

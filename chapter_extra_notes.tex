@@ -6,11 +6,17 @@
 \newpage
 \section{Some Notes}
 
-% Please add the following required packages to your document preamble:
+\subsection{On-policy vs. Off-policy}
+
+These two concepts are introduced in Chapter 5.
+
+On-policy methods can be a special case of off-policy, where the target policy and behavior policy are the same.
 \begin{table}[h!]
 \begin{tabular}{@{}ll@{}}
 \toprule
 on-policy                       & off-policy                                                                                                                  \\ \midrule
+simpler, considered first       & greater variance, slower converge
+\\
 Agent can pick actions          & Agent can't pick actions                                                                                                    \\
 most obvious setup :)           & \begin{tabular}[c]{@{}l@{}}learning with exploration\\ playing without exploration\end{tabular}                             \\
 Agent always follows own policy & \begin{tabular}[c]{@{}l@{}}Learning from expert (expert is imperfect)\\ Learning from sessions (recorded data)\end{tabular} \\ \bottomrule
