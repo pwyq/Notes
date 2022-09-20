@@ -6,6 +6,12 @@
 \newpage
 \section{Temporal-Difference Learning}
 
+TD learning is a learning method that's specialized for prediction learning (the scalable model-free learning). TD learning is learning a prediction from another, later, learned prediction (i.e., learning a guess from a guess).
+The TD error is the difference between two predictions, the temporal difference; otherwise TD learning is the same as supervised learning, backpropagating the error.
+You can think one step TD (make a prediction, wait one step, see the result) as traditional supervised learning (supervisor tells you the result after one step).
+
+Note prediction problem means policy evaluation, control problem means finding $\pi_*$.
+
 TD combines some of the features of both MC and DP. TD does not require a model and can learn from interactions (like MC), and TD can bootstrap, thus learn online (without waiting till the end of episodes) (like DP).
 
 TD($\lambda$) unifies DP, MC, TD.
@@ -88,6 +94,8 @@ TD methods have an advantage over DP methods in that they do not require a model
 
 TD methods over MC methods is that they are naturally implemented in an online, fully incremental fashion.
 
+TD converges faster than MC.
+
 \subsection{Optimality of TD(0)}
 
 \begin{definition}
@@ -101,15 +109,137 @@ TD methods over MC methods is that they are naturally implemented in an online, 
 
 In batch form, TD(0) is faster than MC methods because it computes the true certainty-equivalence estimate.
 
+\subsection{Sarsa: On-policy TD control}
+
+This week, you will learn about using temporal difference learning for control, as a generalized policy iteration strategy. You will see three different algorithms based on bootstrapping and Bellman equations for control: Sarsa, Q-learning and Expected Sarsa. You will see some of the differences between the methods for on-policy and off-policy control, and that Expected Sarsa is a unified algorithm for both. You will implement Expected Sarsa and Q-learning, on Cliff World.
+
+We consider transitions from state-action pair to state-action pair.
+
+\begin{definition}
+\textbf{SARSA},
+$$ Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha [ R + \gamma Q( S_{t+1}, A_{t+1}) - Q(S_t, A_t)]$$
+If $S_{t+1}$ is terminal, then $Q(S_{t+1}, A_{t+1}) = 0$.
+\end{definition}
+
+Since the update rule uses every element of the quintuple of events, $$(S_t, A_t, R, S_{t+1}, A_{t+1})$$, that make up a transition from one state-action pair to the next. Hence, the algorithm name \textit{SARSA}.
+
+\begin{tcolorbox}[width=1.1\textwidth,title={SARSA (on-policy TD control} for estimating $Q\approx q_*$]
+Algorithm parameters: step size $\alpha \in (0,1]$, small $\epsilon > 0$
+
+Init $Q(s,a)$, $\forall s \in \S^+$, $a \in \A(s)$, arbitrarily except that $Q(terminal,\cdot)=0$
+
+Loop for each episode:
+
+$\quad$Init $S$
+
+$\quad$Choose $A$ from $S$ using policy derived from $Q$ (eg $\epsilon$-greedy)
+
+$\quad$Loop for each step of episode:
+
+$\quad\quad$Take action $A$, observe $R$, $S'$
+
+$\quad\quad$Choose $A'$ from $S'$ using policy derived from $Q$ (eg $\epsilon$-greedy)
+
+$\quad\quad Q(S, A) \leftarrow Q(S, A) + \alpha [ R + \gamma Q( S', A') - Q(S, A)]$
+
+$\quad\quad S \leftarrow S'$; $A \leftarrow A'$
+
+$\quad$until $S$ is terminal
+\end{tcolorbox}
+
+The reason that SARSA is on-policy is that it updates its Q-values using the Q-value of the next state $S'$ and the current policy's action $A'$. It estimates the return for state-action pairs assuming the current policy continues to be followed.
+
+\subsection{Q-learning: Off-policy TD control}
+
+\begin{definition}
+\textbf{Q-learning},
+$$Q(S_t,A_t)\leftarrow Q(S_t, A_t)+\alpha [R + \gamma max_a Q(S_{t+1}, a) - Q(S_t, A_t)]$$
+\end{definition}
+
+\begin{tcolorbox}[width=1.1\textwidth,title={Q-learning (off-policy TD control} for estimating $\pi\approx \pi_*$]
+Algorithm parameters: step size $\alpha \in (0,1]$, small $\epsilon > 0$
+
+Init $Q(s,a)$, $\forall s \in \S^+$, $a \in \A(s)$, arbitrarily except that $Q(terminal,\cdot)=0$
+
+Loop for each episode:
+
+$\quad$Init $S$
+
+$\quad$Loop for each step of episode:
+
+$\quad\quad$Choose $A$ from $S$ using policy derived from $Q$ (eg $\epsilon$-greedy)
+
+$\quad\quad$Take action $A$, observe $R$, $S'$
+
+$\quad\quad Q(S, A) \leftarrow Q(S, A) + \alpha [ R + \gamma max_a Q( S', a) - Q(S, A)]$
+
+$\quad\quad S \leftarrow S'$
+
+$\quad$until $S$ is terminal
+\end{tcolorbox}
+
+The reason that Q-learning is off-policy is that it updates its Q-values using the Q-value of the next state $S'$ and the greedy action $a$. In other words, it estimates the \textit{return} (total discounted future reward) for state-action pairs assuming a greedy policy were followed despite the fact that it's not following a greedy policy.
+
+
+\begin{table}[h!]
+\begin{tabular}{lll}
+            & SARSA              & Q-learning         \\ \hline
+Choosing A' & $\pi$ & $\pi$ \\ \hline
+Updating Q  & $\pi$ & $b$    \\ \hline             
+\end{tabular}
+\end{table}
+where $\pi$ is, for example, a $\epsilon$-greedy policy ($\epsilon > 0$ with exploration), and $b$ is a greedy policy (e.g. $\epsilon = 0$, no exploration)
+
+\begin{enumerate}
+\item Given that Q-learning is using different policies for choosing next action $A'$ and updating $Q$. In other words, it is trying to evaluate $\pi$ while following another policy $b$, so it's an off-policy algorithm
+\item In contrast, SARSA follows $\pi$ all the time, hence it is an on-policy algorithm.
+\end{enumerate}
+
+\subsection{Expected Sarsa}
+
+Expected SARSA like Q-learning except that instead of the maximum over next state-action pairs, it uses the expected value (taking into account how likely each action is under the current policy).
+
+\begin{definition}
+\textbf{Expected SARSA},
+
+$$Q(S_t, A_t)\leftarrow Q(S_t, A_t) + \alpha [R_t + \gamma \E_\pi [Q(S_{t+1}, A_{t+1})|S_{t+1}] - Q(S_t, A_t)]$$
+$$Q(S_t, A_t)\leftarrow Q(S_t, A_t) + \alpha [R_t + \gamma \sum_a \pi(a|S_{t+1})Q(S_{t+1},a) - Q(S_t, A_t)]$$
+\end{definition}
+
+Expected SARSA moves deterministically in the same direction as SARSA moves in expectation.
+Expected SARSA is more complex computationally than SARSA, but in return, it eliminates the variance due to the random selection of $A_{t+1}$.
+
+\subsubsection{TD control and Bellman equations}
+
+TD control algorithms are based on Bellman equations.
+
+$$q_\pi(s,a) = \sum_{s',r} p(s',r|s,a) (r + \gamma \sum_{a'} \pi(a'|s')q_\pi(s',a'))$$
+
+SARSA, on-policy, uses the sample based version of the Bellman equation $R + \gamma Q(S_{t+1}, A_{t+1})$, learns $q_\pi$.
+
+Expected SARSA, on/off-policy, uses the same Bellman equation as SARSA, but samples it differently. It takes an expectation over the next action values. $R+\gamma\sum_{a'}\pi(a'|S_{t+1})Q(S_{t+1},a')$
+
+$$q_*(s,a) = \sum_{s',r} p(s',r|s,a) (r+\gamma max_{a'} q_* (s',a'))$$
+
+Q-learning, off-policy, uses the Bellman optimality equation $R + \gamma max_{a'} Q(S_{t+1},a')$, it learns $q_*$.
+
+SARSA can do better than Q-learning when performance is online, because on-policy control methods account for their own exploration.
+
 \subsection{Learning Objectives (UA RL MOOC)}
 
 Lesson 1: Introduction to Temporal Difference Learning
 
 1. Define temporal-difference learning
 
+A way to incrementally estimate the return through bootstrapping
+
 2. Define the temporal-difference error
 
+$$\delta_t \doteq \underbrace{R_{t+1} + \gamma V(S_{t+1})}_\text{TD Target} - V(S_t)$$
+
 3. Understand the TD(0) algorithm
+
+see chap 6.1
 
 Lesson 2: Advantages of TD
 
@@ -118,5 +248,64 @@ Lesson 2: Advantages of TD
 5. Identify key advantages of TD methods over Dynamic Programming and Monte Carlo methods
 
 6. Identify the empirical benefits of TD learning
+
+7. TD can be used both in continuing tasks and episodic tasks (because TD updates at every time step!)
+
+8. Both TD(0) and MC methods converge to the true value function asymptotically, given that the environment is Markovian.
+
+9. TD and MC use sample updates, DP uses expected updates.
+
+10. Suppose we have current estimates for the value of two states: $V(A) = 1, V(B) = 1$ in an episodic setting. We observe the following trajectory: A, 0, B, 1, B, 0, T where T is a terminal state. Apply TD(0) with step-size, $\alpha = 1$, and discount factor, $\gamma = 0.5$. What are the value estimates for state $A$ and state $B$ at the end of the episode?
+
+Solution: My mistake was that I thought I need to update all the way to the end, then backpropagate the state value back.
+Actually, here are the transition pairs, $(S, R, S')$ = $(A, 0, B)$, $(B, 1, B)$, and $(B, 0, T)$. We can update the value estimate at each time step.
+
+For example, after observing $(A, 0, B)$, we have
+
+$$V(A) \leftarrow V(A) + \alpha [R + \gamma V(B) - V(A)]$$
+
+Note that in above, $B$ is the next state $S_{t+1}$.
+
+$$V(A) = 1 + 1 [0 + 0.5 * 1 - 1]$$
+
+So, $V(A) = 0.5$ and $V(B) = 1$ (remains the same).
+
+Lesson 4: TD for control
+
+11. Explain how generalized policy iteration can be used with TD to find improved policies
+
+12. Describe the Sarsa Control algorithm
+
+13. Understand how the Sarsa control algorithm operates in an example MDP
+
+14. Analyze the performance of a learning algorithm
+
+Lesson 5: Off-policy TD control: Q-learning
+
+15. Describe the Q-learning algorithm
+
+16. Explain the relationship between Q-learning and the Bellman optimality equations.
+
+17. Apply Q-learning to an MDP to find the optimal policy
+
+18. Understand how Q-learning performs in an example MDP
+
+19. Understand the differences between Q-learning and Sarsa
+
+20. Understand how Q-learning can be off-policy without using importance sampling
+
+21. Describe how the on-policy nature of SARSA and the off-policy nature of Q-learning affect their relative performance
+
+Lesson 6: Expected Sarsaz
+
+22. Describe the Expected Sarsa algorithm
+
+23. Describe Expected Sarsa’s behaviour in an example MDP
+
+24. Understand how Expected Sarsa compares to Sarsa control
+
+25. Understand how Expected Sarsa can do off-policy learning without using importance sampling
+
+26. Explain how Expected Sarsa generalizes Q-learning
 
 \end{document}
