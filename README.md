@@ -1,0 +1,4 @@
+- Reinforcement Learning, Coursera - University of Alberta
+    - textbook(s): Reinforcement Learning: An Introduction, Richard Sutton, Andrew Barto
+- Modern Robotics, Coursera - Northwestern University
+    - textbook(s): Modern Robotics: Mechanics, Planning, and Control
