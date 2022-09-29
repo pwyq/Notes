@@ -156,7 +156,7 @@ The reason that SARSA is on-policy is that it updates its Q-values using the Q-v
 $$Q(S_t,A_t)\leftarrow Q(S_t, A_t)+\alpha [R + \gamma max_a Q(S_{t+1}, a) - Q(S_t, A_t)]$$
 \end{definition}
 
-\begin{tcolorbox}[width=1.1\textwidth,title={Q-learning (off-policy TD control} for estimating $\pi\approx \pi_*$]
+\begin{tcolorbox}[width=1.1\textwidth,title={Q-learning (off-policy TD control) for estimating $\pi\approx \pi_*$}]
 Algorithm parameters: step size $\alpha \in (0,1]$, small $\epsilon > 0$
 
 Init $Q(s,a)$, $\forall s \in \S^+$, $a \in \A(s)$, arbitrarily except that $Q(terminal,\cdot)=0$
@@ -201,7 +201,6 @@ Expected SARSA like Q-learning except that instead of the maximum over next stat
 
 \begin{definition}
 \textbf{Expected SARSA},
-
 $$Q(S_t, A_t)\leftarrow Q(S_t, A_t) + \alpha [R_t + \gamma \E_\pi [Q(S_{t+1}, A_{t+1})|S_{t+1}] - Q(S_t, A_t)]$$
 $$Q(S_t, A_t)\leftarrow Q(S_t, A_t) + \alpha [R_t + \gamma \sum_a \pi(a|S_{t+1})Q(S_{t+1},a) - Q(S_t, A_t)]$$
 \end{definition}
@@ -231,7 +230,7 @@ Lesson 1: Introduction to Temporal Difference Learning
 
 1. Define temporal-difference learning
 
-A way to incrementally estimate the return through bootstrapping
+We want to update the return, but not want to wait till the end of the upate. We want to incrementally update. TD is a way to incrementally estimate the return through bootstrapping
 
 2. Define the temporal-difference error
 
@@ -245,9 +244,15 @@ Lesson 2: Advantages of TD
 
 4. Understand the benefits of learning online with TD
 
+We can update our estimate at each time step.
+
 5. Identify key advantages of TD methods over Dynamic Programming and Monte Carlo methods
 
+Unlike DP, TD can can directly learn from experience. Unlike MC, TD can update the values on every step TD also converges faster than MC
+
 6. Identify the empirical benefits of TD learning
+
+TD converges faster to a lower final error in the random walk environment.
 
 7. TD can be used both in continuing tasks and episodic tasks (because TD updates at every time step!)
 
@@ -272,40 +277,79 @@ So, $V(A) = 0.5$ and $V(B) = 1$ (remains the same).
 
 Lesson 4: TD for control
 
-11. Explain how generalized policy iteration can be used with TD to find improved policies
+11. Explain how GPI can be used with TD to find improved policies
+
+Recall GPI with MC improve policy after each episode. Instead,
+GPI with TD will improve the policy after just one policy evaluation step.
 
 12. Describe the Sarsa Control algorithm
 
+see chap 6.4 (SARSA, uses state-action transition)
+
 13. Understand how the Sarsa control algorithm operates in an example MDP
 
+see the Windy Gridworld example
+
 14. Analyze the performance of a learning algorithm
+
+see the Windy Gridworld example
 
 Lesson 5: Off-policy TD control: Q-learning
 
 15. Describe the Q-learning algorithm
 
+Q-learning, like SARSA, solves the Bellman equation using samples from environment. But instead of using the standard Bellman equation, Q-learning uess the Bellman's optimality equation for action values. The optimality equations enable Q-learning to directly learn $Q_*$ instead of switching between policy improvement and policy evaluation steps.
+
 16. Explain the relationship between Q-learning and the Bellman optimality equations.
+
+SARSA is sample-based version of \textit{policy iteration} which uses Bellman equations for action values, that each depend on a fixed policy.
+
+Q-learning is a sample-based version of \textit{value iteration} which iteratively applies the Bellman optimality equation.
 
 17. Apply Q-learning to an MDP to find the optimal policy
 
+see Windy gridword
+
 18. Understand how Q-learning performs in an example MDP
+
+see Windy gridword
 
 19. Understand the differences between Q-learning and Sarsa
 
+SARSA (on-policy)
+$$ Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha [ R + \gamma Q( S_{t+1}, A_{t+1}) - Q(S_t, A_t)]$$
+Q-learning: (off-policy)
+$$Q(S_t,A_t)\leftarrow Q(S_t, A_t)+\alpha [R + \gamma max_a Q(S_{t+1}, a) - Q(S_t, A_t)]$$
+
 20. Understand how Q-learning can be off-policy without using importance sampling
+
+In SARSA, the agent bootstraps off the value of the value of the action it's going to take next, which is sampled from its behavior policy. Q-learning instead bootstraps off of the \textit{largest} action value in its next state. The is like sampling an action under an estimate of the optimal policy rather than the behavior policy. Since Q-learning learns about the best action it could take rather the actions it actually takes, it is learning off-policy.
 
 21. Describe how the on-policy nature of SARSA and the off-policy nature of Q-learning affect their relative performance
 
-Lesson 6: Expected Sarsaz
+cliff walking example, Q-learning follows optimal policy, but its own $\epsilon$-greedy action selection makes it fall off and result in lower reward.
+
+Lesson 6: Expected Sarsa
 
 22. Describe the Expected Sarsa algorithm
+$$Q(S_t, A_t)\leftarrow Q(S_t, A_t) + \alpha [R_t + \gamma \sum_a \pi(a|S_{t+1})Q(S_{t+1},a) - Q(S_t, A_t)]$$
 
 23. Describe Expected Sarsa’s behaviour in an example MDP
 
 24. Understand how Expected Sarsa compares to Sarsa control
 
+Expected SARSA has a more stable update target than SARSA. In general, Expected SARSA has much lower variance than SARSA (but at a cost of computation)
+
 25. Understand how Expected Sarsa can do off-policy learning without using importance sampling
 
+The expectation over actions is computed independently of the action actually selected in the next state. In fact, $\pi$ in the Expected SARSA update rule does not need to be equal to $b$.
+
 26. Explain how Expected Sarsa generalizes Q-learning
+
+If the target policy is greedy w.r.t its action value estimates, then only the highest value action is considered in the expectation. Just like Q-learning, computing the maximum over actions in the next state.
+
+27. Q-learning does not learn about the outcomes of exploratory actions because the update in Q-learning only learns about the greedy action
+
+28. SARSA, Q-learning, and Expected SARSA have similar targets on a transition on a \textit{terminal} state, because the target in this case only depends on reward.
 
 \end{document}
