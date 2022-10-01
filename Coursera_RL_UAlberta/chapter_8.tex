@@ -58,6 +58,8 @@ $\quad$Apply one-step tabular Q-\textbf{learning} to $S,A,R,S'$:
 $\quad\quad Q(S,A)\leftarrow Q(S,A) + \alpha [R + \gamma max_a Q(S',a) - Q(S,A)]$
 \end{tcolorbox}
 
+How does this differ from DP-value iteration? It does not \textbf{sweep} all states.
+
 
 \subsection{Dyna: Integrated Planning, Acting, and Learning}
 
@@ -228,6 +230,10 @@ Explore to make sure it's model is accurate, exploit the model to compute the op
 
 We add a bonus rewards for exploration, new reward = $r + \kappa\sqrt{\tau}$, where $\kappa$ is small constant and $\tau$ is timesteps since transition was last tried.
 
+21. (new research area?) We can have a separate thread (multi-threading) for planning specifically.
 
+22. UCB method is similar to the bonus reward of Dyna-Q+: the difference is that they use differently (UCB can't work with nonstationary problems)
+
+23. (new research area?) We start an easy and safe environment for the agent then we gradually make the environment more realistic/dangerous to the agent.
 
 \end{document}

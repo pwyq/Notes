@@ -135,7 +135,7 @@ Parameter: $\alpha > 0$
 
 Init the value-function weights $\bm{w} \in \R^d$ arbitrarily
 
-Loop forever (for each episode):
+Loop for each episode:
 
 $\quad$Init $S$
 
@@ -207,6 +207,85 @@ The difference between these two errors depends on $\gamma$ and the quality of f
 
 Why isn't the TD fixed point error equal to the minimum value error solution? This is because bootstrapping under function approximation. If our function approximator is good, then our estimate of the next state will be accurate.
 
+\begin{tcolorbox}[width=1.1\textwidth,title={n-step semi-gradient TD for estimating $\hat{v}\approx v_\pi$}]
+Input: $\pi$ to be evaluated, a differentiable function $\hat{v}:S\times\R^d \rightarrow \R$ where $\hat{v}(terminal,\dot)=0$
+
+Parameter: $\alpha > 0$, $n > 0$
+
+Init the value-function weights $\bm{w} \in \R^d$ arbitrarily
+
+All store and access operations ($S_t$ and $R_t$) can their index mod $n+1$
+
+Loop for each episode:
+
+$\quad$Init and store $S_0 \neq$ terminal
+
+$\quad T \leftarrow \inf$
+
+$\quad$Loop for t = 0,1,2,...:
+
+$\quad\quad$If $t<T$,then:
+
+$\quad\quad\quad$Take an action according to $\pi(\cdot|S_t)$
+
+$\quad\quad\quad$Observe and store $R_{t+1}$ and $S_{t+1}$
+
+$\quad\quad\quad$If $S_{t+1}$ is terminal, then $T \leftarrow t+1$
+
+$\quad\quad\tau \leftarrow t-n+1$ ($\tau$ is the time whose state's estimate is being updated)
+
+$\quad\quad$If $\tau \geq 0$:
+
+$\quad\quad\quad G \leftarrow \sum_{i=\tau + 1}^{min(\tau+n,T)} \gamma^{i-\tau-1}R_i$
+
+$\quad\quad\quad$If $\tau + n < T$, then: $G\leftarrow G+\gamma^n \hat{v} (S_{\tau + n}, \bm{w})$
+
+$\quad\quad\quad \bm{w} \leftarrow \bm{w} + \alpha [G - \hat{v}(S_{\tau},\bm{w})]\nabla \hat{v}(S_{\tau},\bm{w})$
+
+$\quad$until $\tau = T-1$
+\end{tcolorbox}
+
+\subsection{Feature Construction for Linear Methods}
+
+Choosing features appropriate to the task is an important way of adding \textit{prior domain knowledge} to reinforcement learning systems.
+
+Linear methods,
+\begin{itemize}
+\item pro: guarantee convergence, data efficient, computation efficient
+\item con: does not consider interactions between features
+\end{itemize}
+
+\subsubsection{Polynomials}
+\subsubsection{Fourier Basis}
+\subsubsection{Coarse Coding}
+
+\begin{definition}
+\textbf{binary feature}: 1-0 valued feature, 1 for present, 0 for absent.
+\end{definition}
+\begin{definition}
+\textbf{coarse coding}: representing a state with binary features that overlap.
+\end{definition}
+
+\begin{figure}[h!]
+  \includegraphics[width=0.7\linewidth]{c9-coarse-coding.png}
+  \caption{Coarse coding. Generalization from $s$ to $s'$ depend on the number of their features whose receptive fields overlap}
+  \label{fig:coarse-coding}
+\end{figure}
+
+\begin{figure}[h!]
+  \includegraphics[width=0.7\linewidth]{c9-coarse-coding-2.png}
+  \caption{Generalization in linear function approximation methods is determined by the sizes and shapes of the features' receptive fields. All three of these cases have roughly the same number and density of features.}
+  \label{fig:coarse-coding}
+\end{figure}
+
+\subsubsection{Tile Coding}
+
+\begin{definition}
+\textbf{Tile coding}, a form of coarse coding for multi-dimensional continuous spaces that is flexible and computationally efficient.
+\end{definition}
+This may be the most practical feature representation for modern sequential digital computers.
+
+In the coding, the receptive fields of the features are grouped into partitions of the state space. Each such partition is called a \textit{tiling}, and each element of the partition is called a \textit{tile}.
 
 \subsection{Learning Objectives (UA RL MOOC)}
 
@@ -320,5 +399,49 @@ linear TD is a strict generalization on both tabular TD and TD with state aggreg
 \end{itemize}
 
 linear semi-gradient TD (aka TD with linear function approximation)
+
+-----------------------------------------
+
+Lesson 1: Feature Construction for Linear Methods 
+
+24. Describe the difference between coarse coding and tabular representations 
+
+25. Explain the trade-off when designing representations between discrimination and generalization 
+
+26. Understand how different coarse coding schemes affect the functions that can be represented 
+
+27. Explain how tile coding is a (computationally?) convenient case of coarse coding 
+
+28. Describe how designing the tilings affects the resultant representation 
+
+29. Understand that tile coding is a computationally efficient implementation of coarse coding 
+
+Lesson 2: Neural Networks 
+
+30. Define a neural network
+
+31. Define activation functions
+
+32. Define a feed-forward architecture 
+
+33. Understand how neural networks are doing feature construction 
+
+34. Understand how neural networks are a non-linear function of state 
+
+35. Understand how deep networks are a composition of layers 
+
+36. Understand the trade-off between learning capacity and challenges presented by deeper networks 
+
+Lesson 3: Training Neural Networks 
+
+37. Compute the gradient of a single hidden layer neural network 
+
+38. Understand how to compute the gradient for arbitrarily deep networks 
+
+39. Understand the importance of initialization for neural networks 
+
+40. Describe strategies for initializing neural networks 
+
+41. Describe optimization techniques for training neural networks
 
 \end{document}
