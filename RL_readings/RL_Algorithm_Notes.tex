@@ -508,7 +508,89 @@ An improvement on SAC formulates a constrained optimization problem: while maxim
 - optional, highly-related references
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% QR-TD3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\subsection{Tactical Optimism and Pessimism for Deep Reinforcement Learning (QR-TD3)}
+\subsubsection{Summary}
 
+This paper proposes a new framework (TOP) that switches between optimistic and pessimistic value learning in online setting. The framework is then combined with TD3, producing a new algorithm named TOP-TD3. TOP-TD3 is the state-of-the-art in tested continuous tasks.
+
+\subsubsection{Research Objective(s)}
+
+Propose a new framework that learns to balance optimistic and pessimistic value estimation online.
+
+By optimism, it means overestimation, taking upper bound and/or doing max operation (of some functions);
+by pessimism, it means taking lower bound and/or doing min operation (of some functions).
+
+\subsubsection{Background / Problem Statement}
+
+Function approximators results in positive bias, which can be turned to overestimation for exploration as a form of optimism. However, the overestimation is dangerous (instability in training; large estimation error), and, according to some research, should be minimized, which is a form of pessimism.
+
+The authors investigate why these two contradicting opinions can both achieve state-of-the-art algorithms by considering the degree of estimation bias is a function of the environment.
+
+\subsubsection{Method(s)}
+
+\begin{itemize}
+\setlength\itemsep{1em}
+\item The authors use the notation of aleatoric (intrinsic) uncertainty, and epistemic (parametric) uncertainty to model the uncertainty of environment. This requires a quantile distributional return (also used in some literatures).
+\begin{itemize}
+	\item aleatoric uncertainty: $\underbrace{Z^{\pi}_a (s,a)}_{\text{full return dist.}} \underbrace{\stackrel{D}{=}}_{\text{equality in dist.}} R(s,a) + \gamma \underbrace{Z(S',A")}_{\text{random return}} $
+	\item epistemic uncertainty: $Z^{\pi}_e (s,a) \stackrel{D}{=} \underbrace{\overline{Z}(s,a)}_{\text{Gaussian dist.}} + \epsilon \underbrace{\sigma(s,a)}_{\text{std. of quantile est.}\atop\text{across critics}}$
+\end{itemize}
+\item quantile function: $ q_{\overline{Z}(s,a)} = \E_{\epsilon} [q_{Z^{\pi}(s,a)}]$
+\item quantile approximation, $q^{(k)}(s,a)$ approximates $k$-th quantile of $Z^{\pi}_a (s,a)$, learned by a DNN (parameterized by $\phi$)
+\begin{itemize}
+	\item $\overline{q}^{(k)}(s,a) = \frac{1}{2}(q^{(k)}_1(s,a) + q^{(k)}_2(s,a))$ (from two stored estimates, which later are used as two critics)
+\end{itemize}
+\item belief distribution $Z_b(s,a)$ to measure optimism ($\beta \geq 0$) or pessimism ($\beta < 0$)
+\begin{itemize}
+	\item $q_{Z_b (s,a)} = q_{\overline{Z}(s,a)} + \beta q_{\sigma(s,a)}$
+\end{itemize}
+\item Actor-Critic structure (actor maximizes expected return with $\pi$, critic evaluates actions of $\pi$)
+\begin{itemize}
+	\setlength\itemsep{0.5em}
+	\item critic: $\Delta \phi_i \propto \sum_{1\leq k,j\leq K} \nabla_{\phi_i} L_{Huber}(\delta_i^{(j,k)})$
+	\item TD error for $Z_i(s,a)$: $\delta_i^{(j,k)} \doteq r + \gamma\tilde{q}^{(j)} - q^{(k)}_i$, $\tilde{q} = \overline{q}^k + \beta \sigma^{(k)}$
+	\item actor: $\Delta \theta \propto \nabla_a \tilde{Q}(s,a)|_{a=\pi_\theta(s)}\nabla_\theta\pi_\theta(s)$, $\tilde{Q}(s,a) = \frac{1}{K}\sum_{k=1}^K \tilde{q}^{(k)}(s,a)$
+	\item the actor update is the same as DPG gradient
+\end{itemize}
+\item On-the-fly learning procedure (AutoRL)
+\end{itemize}
+
+\subsubsection{Evaluation}
+
+\begin{itemize}
+\item tested on 7 state-based continuous-control tasks from MuJoCo (Humanoid, HalfCheetah, Hopper, Walker2d, Ant, InvDoublePend, Reacher); outperform all baselines
+\begin{itemize}
+	\item baselines: TD3, SAC, OAC, QR-TD3, (non-dist.) TOP-TD3
+\end{itemize}
+\item tested on pixel-based tasks with TOP-SAC (or TOP-RAD in the paper), outperform all except one task
+\begin{itemize}
+	\item baselines: DrQ, PI-SAC, CURL, PlaNet, Dreamer
+\end{itemize}
+\item code: https://github.com/tedmoskovitz/TOP
+\end{itemize}
+
+\subsubsection{Conclusion}
+
+\begin{itemize}
+\item TOP, a dynamically adaptive strategy for value estimation, outperforms state-of-the-art approaches on continuous control tasks.
+\item \textbf{future work}: interplaying between the degree of optimism and model hyperparameters such as architecture and learning rate, and whether they can be adapted simultaneously. More specifically, learning $\beta$ through a meta-learning or Bayesian framework.
+\item \textbf{future work}: adapting other parameters online, using natural gradient methods, constructing the belief distribution from more than two critics, learning a weighting over quantiles rather than taking mean
+\end{itemize}
+
+\subsubsection{Notes}
+
+\begin{itemize}
+\item quantile vs. expectile? How does this affect learning?
+\item what's natural gradient methods?
+\end{itemize}
+
+\subsubsection{References}
+
+Highly related algorithms are DDPG, D4PG, TD3, and SAC.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

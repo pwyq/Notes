@@ -78,6 +78,8 @@ By assumption we have far more states than weights, so making one state's estima
 \textbf{state distribution $\mu(s)$}: $\mu \geq 0$, $\sum_s \mu(s) = 1$, representing how much we care about the error (square distance between approx value $\hat{v}(s,\bm{w})$ and true value $v_\pi(s)$) in each state $s$.
 \end{definition}
 
+Since we are doing on-policy policy evaluation, the $\mu$ is from policy $\pi$. We can also design $\mu$, then it becomes off-policy prediction.
+
 \begin{definition}
 \textbf{Mean Squared Value Error ($\overline{VE}$)}: a natural objective function,
 $$\overline{VE}(\bm{w}) \doteq \sum_{s\in S} \underbrace{\mu(s)}_{\text{weight}} \underbrace{[v_\pi(s) - \hat{v}(s,\bm{w})]^2}_{\text{error}}$$
@@ -85,7 +87,7 @@ $$\overline{VE}(\bm{w}) \doteq \sum_{s\in S} \underbrace{\mu(s)}_{\text{weight}}
 
 Often $\mu(s)$ is chosen to be the fraction of time spent in $s$. Under on-policy training, this is called \textit{on-policy distribution}. In continuing tasks, the on-policy distribution is the stationary distribution under $\pi$. The book talks about the episodic tasks (not including here).
 
-!! NOTE that the RL community is not sure if $\overline{VE}$ is the right performance objective for RL. But this is the best we can find so far.
+!! NOTE that the RL community is not sure if $\overline{VE}$ is the right performance objective for RL. But this is the best we can find so far. Adam White: VE might not be the best because we are only approximating the exact true values. Instead, we can use Average reward + Policy Gradient methods for control.
 
 \subsection{Stochastic-gradient and Semi-gradient Methods}
 
@@ -259,6 +261,14 @@ Linear methods,
 \subsubsection{Fourier Basis}
 \subsubsection{Coarse Coding}
 
+The features used to construct value estimates, are one of the most important parts of a RL agent.
+
+Recall linear value function approximation $v_\pi(s) \approx \hat{v}(s,\bm{w}) = \bm{w}^T\bm{x}(s)$. Recall that a tabular representation can be expressed as a binary (0 or 1) feature vector. Each state is associated with a different feature. Agent-presented state is 1, all other features are 0. The tabular case is a special case of linear function approximation, where the feature vector is an indicator/one-hot encoding of the state.
+
+This becomes a problem when the feature space is large. Recall that we can use state aggregation to associate nearby states with the same features.
+
+From state aggregation to coarse coding: although state aggregation can have arbitrary shapes, but it does not allow overlapping. We can remove this restriction, and we have coarse coding. Therefore, coarse coding is a generalization of state aggregation.
+
 \begin{definition}
 \textbf{binary feature}: 1-0 valued feature, 1 for present, 0 for absent.
 \end{definition}
@@ -267,17 +277,24 @@ Linear methods,
 \end{definition}
 
 \begin{figure}[h!]
-  \includegraphics[width=0.7\linewidth]{c9-coarse-coding.png}
+  \centering
+  \includegraphics[width=0.5\linewidth]{c9-coarse-coding.png}
   \caption{Coarse coding. Generalization from $s$ to $s'$ depend on the number of their features whose receptive fields overlap}
   \label{fig:coarse-coding}
 \end{figure}
 
+Changing the shapes and sizes of features impacts generalization and discrimination, and so affects the speed of learning and the value functions we can represent.
+
+Coarse coding parameters affect discrimination and generalization, which in turn affect learning accuracy.
+
 \begin{figure}[h!]
-  \includegraphics[width=0.7\linewidth]{c9-coarse-coding-2.png}
+  \includegraphics[width=1\linewidth]{c9-coarse-coding-2.png}
   \caption{Generalization in linear function approximation methods is determined by the sizes and shapes of the features' receptive fields. All three of these cases have roughly the same number and density of features.}
-  \label{fig:coarse-coding}
+  \label{fig:coarse-coding-2}
 \end{figure}
 
+\clearpage % needed when there are float figures
+\newpage
 \subsubsection{Tile Coding}
 
 \begin{definition}
@@ -285,7 +302,121 @@ Linear methods,
 \end{definition}
 This may be the most practical feature representation for modern sequential digital computers.
 
-In the coding, the receptive fields of the features are grouped into partitions of the state space. Each such partition is called a \textit{tiling}, and each element of the partition is called a \textit{tile}.
+In the coding, the receptive fields of the features are grouped into partitions of the state space. Each such partition is called a \textit{tiling}, and each element of the partition is called a \textit{tile}. The tiles of a partition do not overlap.
+
+Recall one tiling is just like state aggregation. Tile coding = multiple overlapped state aggregation. To improve discrimination ability, we use multiple tilings so that we have many small intersections.
+
+\begin{figure}[h!]
+  \includegraphics[width=1\linewidth]{c9-tile-coding.png}
+  \caption{Multiple, overlapping grid-tilings on a limited 2D space. Thee tilings are offset from one another by a uniform amount in each dimension.}
+  \label{fig:tile-coding}
+\end{figure}
+
+To get the strength of coarse coding, we need overlapping receptive fields. The advantages of tile coding
+\begin{itemize}
+\item the total active features at one time is the same for any state
+\item computational advantages from its use of binary feature vectors (just sum all active features)
+\item save memory
+\end{itemize}
+
+The choice of how to offset the tilings from each other affects generalization. Tile asymmetrical offsets are preferred. If the tilings are uniformly offset, then there are diagonal artifacts and substantial variations in the generalization, whereas with asymmetrically offset tilings the generalization is more spherical and homogeneous.
+
+Extensive studies have been made of the effect of different displacement vectors on the generalization of tile coding.
+In choosing a tiling strategy, one has to pick the number of the tilings and the shape of the tiles.
+
+Another useful trick of reducing memory requirements is \textit{hashing} (Like one-to-many mapping).
+
+\subsection{Selecting Step-Size Parameters Manually}
+
+\subsection{Nonlinear Function Approximation: Artificial Neural Networks}
+
+!! Note that neural network, like coarse coding/tile coding, is also a way of feature representation. State aggregation, coarse coding and tile coding are fixed representation. NN are flexible representation (due to learning)
+
+This section is like a summary of the NN course. 
+
+ANN is a network of interconnected units that have some of the properties of neurons.
+
+A feedforward ANN has no loops in its network, i.e., there are no paths within the network by which a unit's output can influence its input. If an ANN has at least one loop in its connections, it is a recurrent rather than a feedforward ANN.
+
+Hidden layers: layers that are neither input/output layers.
+
+A real-valued weight is associated with each link.
+
+The units in ANN are typically semi-linear units, meaning that they compute a weighted sum of their input signals and then apply to the result a nonlinear function (activation function). \textbf{Nonlinearity is essential}: if all the units have linear activation functions, the entire network is equivalent to a network without hidden layers (linear+linear = linear).
+
+An ANN with a single hidden layer containing a large enough finite number of sigmoid units can approximate any continuous function on a compact region of the network's input space to any degree of accuracy.
+
+Training the hidden layers of an ANN is a way to auto create features appropriate for a given problem so that hierarchical representations can be produced w/o replying exclusively on hand-crafted features.
+
+ANN typically learn by a stochastic gradient method. Each weight is adjusted in a direction aimed at improving the network's overall performance as measured by an objective function to be either min/maximized (that is, to estimate the partial derivative of an objective function w.r.t each weight, given the current values of all network's weights).
+
+Backpropagation algorithm consists of alternating forward and backward passes through the network. (In later chapter, we discuss train ANN with RL instead of backpropagation).
+
+Backpropagation may not work well for deep ANN. Because (1) the large number of weights can lead to overfitting; (2) the partial derivatives computed by its backward passes either decay rapidly (slow learning) or grow rapidly (unstable learning).
+
+Overfitting is a problem for any function approximation method that adjusts functions with many degrees of freedom on the basis of limited training data.
+
+Methods for reducing overfitting / improve training
+\begin{itemize}
+\item cross validation: stop training when performance begins to decrease on validation data different from the training data
+\item regularization: modifying the objective function to discourage complexity of the approximation
+\item weight sharing: introducing dependencies among the weights to reduce the number of degrees of freedom
+\item dropout: during training, units are randomly removed from the network along with their connections
+\item deep belief networks: deepest layers are trained first using unsupervised learning
+\item batch normalization: normalizes the output of dep layers before they feed into the following layer
+\item deep residual learning: sometimes it is easier to learn a function differs from the identify function than to learn the function itself (by adding shortcut, or skip connections)
+\item deep convolution neural network
+\end{itemize}
+
+\paragraph{Compute the gradient of a single hidden layer neural network }
+
+\begin{itemize}
+\item step 1: define a loss on the parameters of the NN
+\item step 2: find the parameters which minimize this loss function
+\end{itemize}
+
+Suppose we have input layer $\bm{s}$, hidden layer $\bm{x}$, output layer $\bm{y}$, input-hidden weight $\bm{A}$, hidden-output weight $\bm{B}$.
+
+\begin{itemize}
+\item $\bm{x} \doteq f_A(\bm{\psi})$, $\bm{\psi} \doteq \bm{s}\bm{A}$
+\item $\bm{\hat{y}} \doteq f_B(\bm{\theta})$, $\bm{\theta} = \bm{x}\bm{B}$
+\end{itemize}
+
+Gradient w.r.t $\bm{B}$:
+\begin{align*}
+\frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \bm{B_{jk}}} &= \frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \hat{\bm{y_k}}}\frac{\partial \hat{\bm{y_k}}}{\partial \bm{B_{jk}}} \\
+&= \frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \hat{\bm{y_k}}}\frac{\partial f_{\bm{B}}(\theta_k)}{\partial\theta_k}\frac{\partial\theta_k}{\partial\bm{B}_{jk}} \\
+&= \underbrace{\frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \hat{\bm{y_k}}}\frac{\partial f_{\bm{B}}(\theta_k)}{\partial\theta_k}}_{\delta_k^{\bm{B}}} \bm{x_j}
+\end{align*}
+
+Note that the weight $\bm{A}$ also affect $\bm{x}$, so a chain rule set up is needed here. Gradient w.r.t $\bm{A}$:
+\begin{align*}
+\frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \bm{A_{ij}}} &= \delta_k^{\bm{B}} \frac{\partial\theta_k}{\partial\bm{A}_{ij}} & \frac{\partial\theta_k}{\partial\bm{A}_{ij}} = \bm{B}_{jk}\frac{\partial \bm{x}_j}{\partial \bm{A}_{ij}} \\
+&= \delta_k^{\bm{B}} \bm{B}_{jk}\frac{\partial \bm{x}_j}{\partial \bm{A}_{ij}} & \frac{\partial \bm{x}_j}{\partial \bm{A}_{ij}} = \frac{\partial f_{\bm{A}}(\psi_j) }{\partial \psi_j} \frac{\partial \psi_j}{\partial \bm{A}_{ij}} \\
+&= \delta_k^{\bm{B}} \bm{B}_{jk} \frac{\partial f_{\bm{A}}(\psi_j) }{\partial \psi_j} \frac{\partial \psi_j}{\partial \bm{A}_{ij}} \\
+&= \underbrace{\delta_k^{\bm{B}}\bm{B}_{jk} \frac{\partial f_{\bm{A}}(\psi_j) }{\partial \psi_j}}_{\delta_j^{\bm{A}}} \bm{s}_i
+\end{align*}
+
+Notice that both gradients can be rewritten in a similar form. They have a term $\delta$ that contains an error signal times their input.
+$$\frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \bm{A_{ij}}} = \delta_j^{\bm{A}}\bm{s}_i$$
+$$\frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \bm{B_{jk}}} = \delta_k^{\bm{B}}\bm{x_j}$$
+
+\begin{tcolorbox}[width=1.1\textwidth,title={one-hidden layer backprop algorithm}]
+for each i/o pair $(s,y)$ in dataset:
+
+$\quad\delta_k^{\bm{B}} = \frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \hat{\bm{y_k}}}\frac{\partial f_{\bm{B}}(\theta_k)}{\partial\theta_k}$
+
+$\quad\nabla_{\bm{B}}^{jk}=\delta_k^{\bm{B}}\bm{x}_j$
+
+$\quad\bm{B} = \bm{B} - \alpha_{\bm{B}}\nabla_{\bm{B}}$
+
+$\quad\delta_j^{\bm{A}} = \delta_k^{\bm{B}}\bm{B}_{jk} \frac{\partial f_{\bm{A}}(\psi_j) }{\partial \psi_j}$
+
+$\quad\nabla_j^{\bm{A}} = \delta_j^{\bm{A}}\bm{s}_i$
+
+$\quad\bm{A} = \bm{A} - \alpha_{\bm{A}}\nabla_{\bm{A}}$
+\end{tcolorbox}
+First get prediction $\hat{y}$ (forward pass), then compute the gradients backwards from the output. Specifically, we first compute $\delta_{\bm{B}}$ and the gradient for B, then we use this gradient to update the parameters $\bm{B}$, the step size $\alpha_{\bm{B}}$. Next we update the parameters $\bm{A}$, we compute $\delta_{\bm{A}}$ which uses $\delta_{\bm{B}}$. Notice that by computing the gradients backwards, we avoid re-computing the same terms; In fact, this is the main idea behind backpropgation: it is simple GD with efficient strategy to compute gradients.
 
 \subsection{Learning Objectives (UA RL MOOC)}
 
@@ -406,42 +537,88 @@ Lesson 1: Feature Construction for Linear Methods
 
 24. Describe the difference between coarse coding and tabular representations 
 
+Tabular states can be represented with a binary one-hot encoding. Tabular representations become infeasible when state space is large (a state associate with a feature). We then introduced state aggregation to resolve this, where one feature represents many states.
+Coarse coding is a further generalization of state aggregation, which allows overlapping of features (receptive fields).
+
 25. Explain the trade-off when designing representations between discrimination and generalization 
+
+The size, shape, and number of features (receptive fields) affect the generalization and discrimination, thus affecting learning accuracy.
+For example, larger circle can generalize better, but discrimination is   worse.
 
 26. Understand how different coarse coding schemes affect the functions that can be represented 
 
+Recall the step-function approximation in the textbook.
+
 27. Explain how tile coding is a (computationally?) convenient case of coarse coding 
+
+Since grid is uniform, it's easy to compute which cell the current state is in.
 
 28. Describe how designing the tilings affects the resultant representation 
 
-29. Understand that tile coding is a computationally efficient implementation of coarse coding 
+The symmetry/asymmetry offsets affect tile coding's generalization and discrimination.
+
+29. ...
 
 Lesson 2: Neural Networks 
 
 30. Define a neural network
 
+\begin{itemize}
+\item NN = input layer + hidden layer(s) + output layer
+\item layer = node(s); layers are linked, each link is a real-valued weight
+\item node contains non-linear function (active function)
+\end{itemize}
+
 31. Define activation functions
+
+activation function = non-linear function (Sigmoid, ReLU, step function)
 
 32. Define a feed-forward architecture 
 
+A network without link from output to input.
+
 33. Understand how neural networks are doing feature construction 
+
+Tile coding has fixed parameters before learning, NN has both fixed and learned parameters. So NN can use both prior knowledge and knowledge from data to do feature construction.
 
 34. Understand how neural networks are a non-linear function of state 
 
+Non-linear activation function resulting in a non-linear function of the inputs.
+
 35. Understand how deep networks are a composition of layers 
+
+We can have many hidden layers (1) to allow composition of features. Composition can produce more specialized features by combining modular components; (2) to obtain abstractions, DNN compose many layers of lower-level of abstractions with each successive layer contributing to increasingly abstract representation.
 
 36. Understand the trade-off between learning capacity and challenges presented by deeper networks 
 
+Challenges mostly from overfitting and training efficiency.
+
 Lesson 3: Training Neural Networks 
 
-37. Compute the gradient of a single hidden layer neural network 
+37. Understand the importance of initialization for neural networks 
 
-38. Understand how to compute the gradient for arbitrarily deep networks 
+If we choose a bad init parameters, we either have zero gradient or stuck in local optima.
 
-39. Understand the importance of initialization for neural networks 
+38. Describe strategies for initializing neural networks 
 
-40. Describe strategies for initializing neural networks 
+\textbf{Method I}: randomly sample the initial weights from a normal distribution with small variance, and normalize the weights.
+$$\bm{w}_{init}\sim \frac{N(0,1)}{\sqrt{n_{inputs}}}$$
+This way, each neuron has a different output from other neurons within its layer. This provides a more diverse set of potential features. By keeping the variants small, we ensure that the output of each neuron is within the same range as its neighbors. By normalizing the weights, we prevent larger variance as number of neurons grows.
 
-41. Describe optimization techniques for training neural networks
+Adam Algorithm are Method II + Method III.
+\textbf{Method II}: Update Momentum $M$
+\begin{align*}
+\bm{w}_{t+1} &\leftarrow \bm{w}_t - \alpha \nabla_{\bm{w}}L(\bm{w}_t)+\lambda M_t \\
+M_{t+1} &\leftarrow \lambda M_t - \alpha \nabla_{\bm{w}}L
+\end{align*}
+The momentum term summarizes the history of the gradients using a decaying sum of gradients with decay rate $\lambda$. If recent updates in the same direction, then we have large momentum, making larger step; if recent updates in the opposite direction, then we kill the momentum.
+
+\textbf{Method III}: vector step sizes
+
+Instead of global step size, this uses different step sizes for different weights.
+
+39. Describe optimization techniques for training neural networks
+
+cross validation, regularization, dropout, residual learning etc
 
 \end{document}
