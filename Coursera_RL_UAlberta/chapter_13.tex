@@ -1,0 +1,142 @@
+\documentclass[sutton_barto_notes.tex]{subfiles}
+\begin{document}
+
+\newpage
+\section{Policy Gradient Methods}
+
+
+
+\subsection{Policy Approximation and its Advantages}
+
+\subsection{The Policy Gradient Theorem}
+
+\subsection{REINFORCE: Monte Carlo Policy Gradient}
+
+\subsection{REINFORCE with Baseline}
+
+\subsection{Actor-Critic Methods}
+
+\subsection{Policy Gradient for Continuing Problems}
+
+\subsection{Policy Parameterization for Continuous Actions}
+
+\subsection{Summary}
+
+\subsection{Learning Objectives (UA RL MOOC)}
+
+Lesson 1: Learning Parameterized Policies 
+
+1. Understand how to define policies as parameterized functions 
+
+Parameterized policy: $\pi(a|s,\bm{\theta})$. Parameterized value function: $\hat{q}(s,a,\bm{w})$
+
+Constraints on the policy parameterization
+\begin{itemize}
+\item $\pi(a|s,\bm{\theta}) \geq 0 \quad \forall a \in \A, s \in \S$
+\item $\sum_{a\in\A} \pi(a|s,\bm{\theta}) = 1 \quad \forall s \in \S$
+\end{itemize}
+
+2. Define one class of parameterized policies based on the softmax function 
+
+$$\pi(a|s,\bm{\theta})\doteq \frac{e^{h(s,a,\bm{\theta})}}{\sum_{b\in\A}e^{h(s,a,\bm{\theta})}}$$
+$h$ function is action preference (it can be parameterized in any way), the exponential function guarantees the probability is positive for each action. The denominator normalizes the output of each action s.t. the sum over actions is one.
+Note action preferences != action values; only the difference between preferences is important.
+
+3. Understand the advantages of using parameterized policies over action-value based methods 
+
+\begin{itemize}
+\item Parameterized policies can autonomously decrease exploration over time. Specifically, the policy can start off stochastic to guarantee exploration; as learning progresses, the policy can naturally converge towards a deterministic greedy policy
+\item They can avoid failures due to deterministic policies with limited function approximation
+\item Sometimes the policy is less complicated than the value function
+\end{itemize}
+
+Lesson 2: Policy Gradient for Continuing Tasks 
+
+4. Describe the objective for policy gradient algorithms 
+
+Our objective:
+$$r(\pi) = \sum_s \mu(s) \sum_a \pi(a|s,\bm{\theta}) \sum_{s',r} p(s',r|s,a)r $$
+\begin{itemize}
+\item $\sum_{s',r} p(s',r|s,a)r$ is $\E[R_t | S_t=s,A_t=a]$ expected reward if we start in state $s$ and take action $a$
+\item $\sum_a \pi(a|s,\bm{\theta}) \sum_{s',r} p(s',r|s,a)r$ is $\E[R_t | S_t=s]$ expected reward of state $s$
+\item $r(\pi)$ is $\E_\pi [ R_t ]$ overall average reward by considering the fraction of time we spend in state $s$ under policy $\pi$.
+\end{itemize}
+Optimizing the average reward objective (policy gradient method):
+$$\nabla r(\pi) = \nabla \sum_s \mu(s) \sum_a \pi(a|s,\bm{\theta}) \sum_{s',r} p(s',r|s,a)r $$
+
+The main challenge is modifying policy changes the distribution $\mu(s)$; in contrast, recall in $\overline{VE}$ objective, the distribution is fixed. We do gradient ascent for PG, while gradient descent in optimizing the mean squared value error.
+
+5. Describe the results of the policy gradient theorem 
+
+Note that chain rule of gradient requires to estimate $\nabla \mu(s)$, which is difficult to estimate since it depends on a long-term interaction between the policy and the environment. The PG theorem proves we don't need that, and following is our result:
+$$\nabla r(\pi) = \sum_s \mu(s) \sum_a \nabla \pi(a|s,\bm{\theta}) q_\pi(s,a)$$
+$\sum_a \nabla \pi(a|s,\bm{\theta}) q_\pi(s,a)$. This is a sum over the gradients of each action probability, weighted by the value of the associated action.
+$r(\pi)$ takes the above expression and sum that over each state. This gives the direction to move the policy parameters to most rapidly increase the overall average reward.
+
+6. Understand the importance of the policy gradient theorem 
+
+Lesson 3: Actor-Critic for Continuing Tasks 
+
+7. Derive a sample-based estimate for the gradient of the average reward objective 
+$$\bm{\theta}_{t+1} \doteq \bm{\theta}_t + \alpha \frac{\nabla \pi(A_t | S_t, \bm{\theta_t})}{\pi(A_t | S_t, \bm{\theta_t})}q_\pi(S_t,A_t)$$
+
+8. Describe the actor-critic algorithm for control with function approximation, for continuing tasks 
+
+Full algorithm see chap 13.6
+
+\begin{itemize}
+\item actor: parameterized policy
+\item critic: value functions, evaluating the actions selected by the actor
+\end{itemize}
+In the update rule, we don't have access to $q_\pi$, so we have to approximate it. For example, one-step bootstrap return TD method:
+$$q_\pi(s,a) = R_{t+1} - \overline{R}+\hat{v}(S_{t+1}, \bm{w}) $$.
+To further improve, we subtract a baseline to reduces the update variance (results in faster learning):
+$$q_\pi(s,a) = R_{t+1} - \overline{R}+\hat{v}(S_{t+1}, \bm{w}) - \hat{v}(S_t, \bm{w}) $$.
+Note this is equals the TD error $\delta$.
+
+Lesson 4: Policy Parameterizations 
+
+9. Derive the actor-critic update for a softmax policy with linear action preferences 
+\begin{align*}
+\bm{w} &= \bm{w} + \alpha^{\bm{w}} \delta \underbrace{\nabla\hat{v}(S,\bm{w})}_{\bm{x}(s)} \quad \text{just like semi-gradient TD}\\
+\bm{\theta} &= \bm{\theta} + \alpha^{\bm{\theta}}\delta \underbrace{\nabla ln \pi(A|S,\bm{\theta})}_{ \bm{x}_h(s,a) - \sum_b \pi(b|s, \bm{\theta})x_h(s,b) }
+\end{align*}
+
+10. Implement this algorithm 
+
+11. Design concrete function approximators for an average reward actor-critic algorithm 
+
+12. Analyze the performance of an average reward agent 
+
+13. Derive the actor-critic update for a gaussian policy 
+
+Probability density means that for a given range, the probability of $x$ lying in that range will be the area under the probability density curve.
+
+Gaussian Distribution
+$$ p.d.f = p(x) \doteq \frac{1}{\sigma \sqrt{2\pi}}exp( -\frac{(x-\mu)^2}{2\sigma^2} )$$
+$\mu$ = mean of distribution, $\sigma$ = standard deviation = $\sqrt{variance}$.
+Gaussian Policy
+$$ p.d.f = \pi(a|s,\bm{\theta}) \doteq \frac{1}{\sigma(s,\bm{\theta}) \sqrt{2\pi}}exp( -\frac{(a-\mu(s,\bm{\theta}))^2}{2\sigma(s,\bm{\theta})^2} )$$
+$\mu(s,\bm{\theta})$ can be any parameterized function.
+$\sigma$ controls the degree of exploration; usually initialized to be large s.t a wide range of actions are tried. As learning process, we expect the variance to shrink and the policy to concentrate around the best action in each state. The agent can reduce the amount of exploration through learning.
+
+For $\theta$,
+$$\nabla ln\pi(a|s, \bm{\theta}_\mu) = \frac{1}{\sigma(s,\bm{\theta})^2}(a-\mu(s,\bm{\theta}))\bm{x}(s)$$
+
+For $\sigma$,
+$$\nabla ln\pi(a|s, \bm{\theta}_\sigma) = (\frac{( a- \mu(s,\bm{\theta}) )^2}{\sigma(s,\bm{\theta})^2} - 1) \bm{x}(s)$$
+
+Advantages of Continuous Actions
+\begin{itemize}
+\item it might not be straightforward to choose a proper discrete set of actions
+\item continuous actions allow use to generalize over actions
+\end{itemize}
+
+
+14. Apply average reward actor-critic with a gaussian policy to a particular task with continuous actions
+
+For discrete actions, we use softmax policy parameterization; for continuous actions, we use Gaussian policy.
+
+
+
+\end{document}
