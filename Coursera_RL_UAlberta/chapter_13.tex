@@ -87,7 +87,7 @@ $\quad\quad\bm{\theta}\leftarrow\bm{\theta}+\alpha\gamma^t G \nabla ln\pi(A_t | 
 
 \subsection{REINFORCE with Baseline}
 
-We include an arbitrary baseline $b(s)$ (as long as it doesn't vary with $a$) to (1) strictly generalize REINFORCE; (2) dynamically adjust to different states for action selection, (and thus faster learning).
+We include an arbitrary baseline $b(s)$ (as long as it doesn't vary with $a$) to (1) strictly generalize REINFORCE; (2) reduce variances w/o introducing bias; (3) dynamically adjust to different states for action selection, (and thus faster learning).
 $$\nabla J(\bm{\theta}) \propto \sum_s\mu(s)\sum_a (q_\pi(s,a) - b(s))\nabla\pi(a|s,\bm{\theta})$$
 Therefore, the update rule is
 \begin{align*}
@@ -95,7 +95,6 @@ Therefore, the update rule is
 &= \bm{\theta} + \alpha (G_t - b(S_t)) \nabla ln \pi(A_t|S_t, \bm{\theta})
 \end{align*}
 A natural choice for the baseline is an estimate of the state value, $\hat{v}(S_t, \bm{w})$.
-
 
 \begin{tcolorbox}[width=1.1\textwidth,title={REINFORCE with baseline (episodic) for estimating $\pi_*$}]
 Input: a differentiable policy parameterization $\pi(a|s,\bm{\theta})$
@@ -124,11 +123,89 @@ $\quad\quad\bm{\theta}\leftarrow\bm{\theta}+\alpha^{\bm{\theta}}\gamma^t \delta 
 
 \subsection{Actor-Critic Methods}
 
+\paragraph{why go from baseline methods to AC?} In REINFORCE with baseline, the learned $\hat{v}(s)$ estimates only the first state of each state transition. It is made prior to the transition's action and thus cannot be used to assess that action. In AC methods, the $\hat{v}(s)$ is also applied to the second state of the transition (which forms a one-step return), so we can assessing that action. This way of assessing actions is called a \textit{critic}.
+
+Note that one-step return introduces bias, but it is often superior to the actual return for lower variance and easier computation. We can fix the bias with n-step returns and eligibility traces.
+
+\begin{definition}
+\textbf{one-step AC} replace the full return of REINFORCE with the one-step return. The baseline of REINFORCE may be a $\hat{v}(s)$, but AC must use $\hat{v}(s)$ as the baseline.
+\begin{align*}
+\bm{\theta_{t+1}} &\doteq \bm{\theta_t} + \alpha (\underbrace{G_{t:t+1}}_{\text{one-step return}} - \hat{v}(S_t, \bm{w})) \frac{\nabla\pi(A_t|S_t,\bm{\theta_t})}{\pi(A_t|S_t,\bm{\theta_t})} \\
+&= \bm{\theta_t} + \alpha (R_{t+1} + \gamma\hat{v}(S_{t+1},\bm{w}) - \hat{v}(S_t, \bm{w})) \frac{\nabla\pi(A_t|S_t,\bm{\theta_t})}{\pi(A_t|S_t,\bm{\theta_t})} \\
+\end{align*}
+\end{definition}
+
+Since we are using one-step return, the one-step AC is full online and incremental.
+
+\begin{tcolorbox}[width=1.1\textwidth,title={One-step Actor-Critic (episodic), for estimating $\pi_\theta\approx\pi_*$}]
+Input: a differentiable policy parameterization $\pi(a|s,\bm{\theta})$
+
+Input: a differentiable state-value function parameterization $\hat{v}(s,\bm{w})$
+
+Algorithm parameter: step size $\alpha^{\bm{\theta}} > 0, \alpha^{\bm{w}} > 0$
+
+Initialize policy parameter $\bm{\theta} \in \R^{d'}$ and state-value weight $\bm{w} \in \R^d$
+
+Loop forever (for each episode):
+
+$\quad$Initialize $S$ (first state of episode)
+
+$\quad I \leftarrow 1$
+
+$\quad$Loop while $S$ != $terminal$ (for each time step):
+
+$\quad\quad A \sim \pi(\cdot | S, \theta)$
+
+$\quad\quad$Take action $A$, observe $S', R$
+
+$\quad\quad \delta\leftarrow R + \hat{v}(S_{t+1},\bm{w}) - \hat{v}(S_t, \bm{w})$
+
+$\quad\quad \bm{w} \leftarrow \bm{w} + \alpha^{\bm{w}}\delta\nabla\hat{v}(S_t,\bm{w})$
+
+$\quad\quad\bm{\theta}\leftarrow\bm{\theta}+\alpha^{\bm{\theta}} I \delta \nabla ln\pi(A_t | S_t, \bm{\theta})$
+
+$\quad\quad I \leftarrow \gamma I$
+
+$\quad\quad S \leftarrow S'$
+\end{tcolorbox}
+
+AC with Eligibility Traces (episodic) is available in the book. We just declare eligibility trace vectors for both $\bm{\theta}$ and $\bm{w}$, and a trace-decay rates $\lambda$. We decay the the $\gamma$ for both ET vectors at each update.
+
 \subsection{Policy Gradient for Continuing Problems}
+
+Recall in chap 10.3, we introduce the average reward for continuing problems and a steady-state distribution $\mu(s)$.
+$$\sum_s \mu(s) \sum_a \pi(a|s,\bm{\theta}) p(s'|s,a) = \mu(s')\quad \forall s' \in \S$$
+
+The pseudocode of AC with ET (continuing) is similar to AC with ET (episodic), except that we (1) replace reward with (reward - mean reward), and the mean reward is update as $\overline{R}\leftarrow\overline{R}+\alpha^{\overline{R}}\delta$; (2) remove $\gamma$ decay.
 
 \subsection{Policy Parameterization for Continuous Actions}
 
+Instead of computing learned probabilities for each of the many actions, we instead learn statistics of the probability distribution.
+
+Recall the probability density function is:
+$$p(s)\doteq\frac{1}{\sigma\sqrt{2\pi}}exp(-\frac{(x-\mu)^2}{2\sigma^2})$$
+To use PDF in policy parameterization
+$$\pi(a|s,\bm{\theta}) \doteq\frac{1}{\sigma(s,\bm{\theta}) \sqrt{2\pi}}exp(-\frac{(a -\mu(s,\bm{\theta}))^2}{2\sigma(s,\bm{\theta})^2})$$
+where we often declare that
+$$\mu(s,\bm{\theta})\doteq \bm{\theta}_\mu^T \bm{x}_\mu (s)$$
+$$\sigma(s,\bm{\theta}) \doteq exp(\bm{\theta}_\sigma^T \bm{x}_\sigma(s)) > 0$$
+
 \subsection{Summary}
+
+\begin{itemize}
+\item In contrary to action-value methods, policy gradient methods perform action selections w/o consulting action-value estimates
+\item Advantages of learn\&store policy parameters
+\begin{itemize}
+\item learn specific probabilities for taking the actions
+\item learn appropriate levels of exploration
+\item approach deterministic policies asymptotically
+\item can handle continuous action spaces
+\end{itemize}
+\item policy gradient theorem provides a strong theoretical foundation
+\item REINFORCE directly follows PG theorem
+\item REINFORCE w/ baseline reduces variance w/o new bias
+\item AC, critic introduces bias, but bootstrapping (TD) is superior than MC (substantially reduce variance)
+\end{itemize}
 
 \subsection{Learning Objectives (UA RL MOOC)}
 
