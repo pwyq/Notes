@@ -255,7 +255,7 @@ Given k actions/choice, each with a numerical reward, each reward are given base
 
 4. Define action-values
 
-values = action values = action value function
+action values = action value function
 
 Action-value is the mean/expected reward of an action.
 
@@ -272,7 +272,7 @@ Exploration select random actions and exploitation select greedy action.
 
 3. Select actions greedily using an action-value function
 
-$$A = argmax(q_values)$$
+$$A = argmax(q_{values})$$
 
 4. Define online learning
 
@@ -312,7 +312,7 @@ see 10
 
 12. Explain the criticisms of optimistic initial values
 
-Optimistic initial values may only well on stationary cases. In nonstationary cases, the advantage of optimistic dwindles as the step size increases.
+Optimistic initial values may only work well on stationary cases. In nonstationary cases, the advantage of optimistic dwindles as the step size increases.
 Another disadvantage is that we do not know how to select the "correct" optimistic initial values.
 
 13. Describe the upper confidence bound action selection method

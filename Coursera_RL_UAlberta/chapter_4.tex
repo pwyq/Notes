@@ -45,7 +45,7 @@ v_{k+1} & \doteq \E_\pi [R_{t+1} + \gamma v_k (S_{t+1}) | S_t = s] \\
 & = \sum_a \pi (a|s) \sum_{s',r} p(s',r|s,a)[r+\gamma v_k (s')]
 \end{align*}
 
-We see that $v_k$ = $v_\pi$ is a fixed point for this update rule as $k \rightarrow \infty$, $v_k$ converges to $v_\pi$. This algorithm is called \textit{iterative policy evaluation}.
+We see that $v_k$ = $v_\pi$ is a \textbf{fixed point} for this update rule as $k \rightarrow \infty$, $v_k$ converges to $v_\pi$. This algorithm is called \textit{iterative policy evaluation}.
 The update is called \textit{expected update}. It is called \textit{expected} because the updates are based on an expectation over all possible next states rather than on a sample next state.
 
 In this algorithm, we use one array and update values in place.
@@ -366,7 +366,7 @@ Sweepless DP algorithm is beyond the scope of this book.
   \label{fig:GPI}
 \end{figure}
 
-For GPI examples, the value iteration only uses one sweep of policy evaluation, and async DP does sweep the in order. Almost all RL methods are GPI.
+For GPI examples, the value iteration only uses one sweep of policy evaluation. Almost all RL methods are GPI.
 
 Monte Carlo sampling method, an alternative to learn a value function, estimates each state value independently by averaging large number of returns.
 Brute-force search is an alternative for finding $\pi_*$ by computing with every $\pi$.
@@ -381,7 +381,7 @@ DP, in the worst case, the time takes to find an optimal solution is polynomial 
 \begin{itemize}
 \item DP requires complete and accurate model of the environment
 \item Policy evaluation: iterative computation of the value function for a given policy
-\item Policy improvement: the computation of an improved policy given the value function for that policy
+\item Policy improvement: the computation of an improved policy (greedy operation) given the value function for that policy
 \item Two most popular DP methods: policy iteration and value iteration, by combining policy evaluation and policy improvement. These two can solve finite MDPs given complete knowledge of the MDP
 \item Classical DP: sweep whole state set, performing expected update on each state. The update is based on all possible successor states and their probabilities of occurring.
 \item Generalized Policy Iteration (GPI): interacting processes (policy evaluation and policy improvement) revolving around an approximate policy and an approximate value function

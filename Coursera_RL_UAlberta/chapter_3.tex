@@ -84,7 +84,7 @@ $$ r(s,a,s') \doteq \E [R_t | S_{t-1}=s, A_{t-1}=a, S_t=s'] = \sum_{r \in \mathc
 \textbf{Question}: Why does the definition of the reward function $r(s,a,s')$ involve the term $p(s'|s,a)$? \url{https://ai.stackexchange.com/q/20244/55308}
 
 Expectation of reward after taking action $a$ in state $s$ and ending up in state $s'$ would be:
-$$ r(s'a,s') \doteq \sum_{r\in \mathcal{R}} r \cdot p(r|s,a,s') $$
+$$ r(s,a,s') \doteq \sum_{r\in \mathcal{R}} r \cdot p(r|s,a,s') $$
 Since we do not define $p(r|s,a,s')$, we have following equation with product rule:
 $$ p(s',r|s,a) = p(s'|s,a) \cdot p(r|s',s,a) $$
 After moving $p(s'|s,a)$ to the LHS, we see that:
@@ -224,7 +224,7 @@ policy, $\pi(A_t=a|S_t=s)$, a mapping from states to probabilities of selecting 
 \item deterministic policy: map each state to an action. $\pi(s)$. 
 \item stochastic policy: map each state to a distribution over all possible actions. $\pi(a|s)$
 \end{itemize}
-Valid policy can only depend on current state, not other things like time or previous state (if, for example, last action affect rewards heavily, then the last action must include in the states). 
+Valid policy can \textbf{only} depend on current state, not other things like time or previous state (if, for example, last action affect rewards heavily, then the last action must include in the states). 
 \newline
 
 Expectation of $R_{t+1}$ in terms of $\pi$ and the four-argument function $p$:
@@ -501,6 +501,7 @@ The scalar values (those expected returns) helps us to choose optimal policies, 
 
 14. Describe the relationship between value functions and policies
 
+Each value function are always associated with some policies. For example, the state value function:
 $$v_\pi (s) = \sum_a \pi (a|s) \sum_{s',r} p(s',r|s,a)[r+\gamma v_\pi(s')] $$
 
 15. Create examples of valid value functions for a given MDP

@@ -33,7 +33,7 @@ r(\pi)&\doteq \lim_{h\to\infty} \frac{1}{h} \sum_{t=1}^h \E[R_t|S_0, A_{0:t-1} \
 &=\lim_{t\to\infty}\E[R_t|S_0, A_{0:t-1} \sim \pi]\\
 &=\sum_s \mu_\pi(s) \sum_a \pi(a|s) \sum_{s',r} p(s',r|s,a)r
 \end{align*}
-Note that the expectation conditioned on initial state $S_0$ and all actions according to $\pi$. The 2nd and 3rd equations hold if the MDP is \textit{ergodic}, that, the \textit{stead-state distribution} $\mu_\pi(s)\doteq lim_{t\rightarrow\inf}P{S_t=s|A_{0:t-1}\sim\pi}$ exists and is independent of $S_0$.
+Note that the expectation conditioned on initial state $S_0$ and all actions according to $\pi$. The 2nd and 3rd equations hold if the MDP is \textbf{\textit{ergodic}}, that is, the \textit{steady-state distribution} $\mu_\pi(s)\doteq lim_{t\rightarrow\inf}P{S_t=s|A_{0:t-1}\sim\pi}$ exists and is independent of $S_0$.
 In other words, in the long run, the expectation f being in a state depends only on the policy and the MDP transition probabilities (the effect of early decisions is temporary).
 
 The steady state distribution $\mu_\pi$ is the special distribution under which you remain in the same distribution if you select actions according to $\pi$.
