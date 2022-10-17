@@ -7,7 +7,7 @@
 
 MC, is for estimating value functions and discovering optimal policies. Unlike methods in previous chapters, MC does not use complete knowledge of the environment. MC only requires \textit{experience} - sample sequences of states, actions and rewards from actual or simulated interaction with an environment. That is, MC is a \textbf{model-free} learning method.
 
-MC is based on averaging complete sample returns. Since we are considering sampling returns, we define MC only for episodic tasks (in this book) \footnote{We can never sample an actual return value in continuous tasks. We may get around by using artificial time horizon, or TD (with eligibility traces); however, all these incur bias. see \url{https://datascience.stackexchange.com/a/77789/137431}}. Once an episode ends, the value estimates and policies change. MC is thus a episode-by-episode update, not a step-by-step (online) update.
+MC is based on averaging \textbf{complete sample returns}. Since we are considering sampling returns, we define MC only for episodic tasks (in this book) \footnote{We can never sample an actual return value in continuous tasks. We may get around by using artificial time horizon, or TD (with eligibility traces); however, all these incur bias. see \url{https://datascience.stackexchange.com/a/77789/137431}}. Once an episode ends, the value estimates and policies change. \textbf{MC is thus a episode-by-episode update}, not a step-by-step (online) update.
 
 The procedure of MC is similar to DP: prediction problem (finding $v_\pi$ and $q_\pi$) -> policy improvement -> control problem (solve by GPI). Except that, in DP, we compute value functions based on model, here we learn value functions from sample returns.
 
@@ -88,19 +88,19 @@ $\quad Returns(s,a) \leftarrow$ empty list, $\forall s \in \mathcal{S}, a \in \m
 
 Loop forever (for each episode):
 
-$\quad$ Choose a random $(S_0, A_0)$ pair s.t. all pairs have nonzero probability
+$\quad$Choose a random $(S_0, A_0)$ pair s.t. all pairs have nonzero probability
 
-$\quad$ Generate an episode(SAR trajectory) from $(S_0, A_0)$, following $\pi$
+$\quad$Generate an episode(SAR trajectory) from $(S_0, A_0)$, following $\pi$
 
 $\quad G \leftarrow 0$
 
-$\quad$ Loop for each step of episode, $t = T-1, T-2, ..., 0$:
+$\quad$Loop for each step of episode, $t = T-1, T-2, ..., 0$:
 
 $\quad\quad G\leftarrow \gamma G + R_{t+1}$
 
-$\quad\quad$ if $(S_t, A_t)$ pair not in the episode:
+$\quad\quad$if $(S_t, A_t)$ pair not in the episode:
 
-$\quad\quad\quad$ Append $G$ to $Returns(S_t, A_t)$
+$\quad\quad\quad$Append $G$ to $Returns(S_t, A_t)$
 
 $\quad\quad\quad Q(S_t, A_t) \leftarrow$ average$(Returns(S_t, A_t))$
 
@@ -118,7 +118,7 @@ The idea is to follow generalized policy iteration (GPI), where we will maintain
 We continuously alter the value function to be a better approximation for the policy, and the policy is continuously improved (see previous chapter).
 
 
-The policy evaluation part is done exactly as described in the previous chapter (MC Prediction), except that we are evaluating the state-action pair, rather than states.
+The policy evaluation part is done exactly as described in the previous section (MC Prediction), except that we are evaluating the state-action pair, rather than states.
 
 The policy improvement part is done by taking greedy actions in each state. That is, for any action-value function $q$, and for every state $s$, the greedy policy chooses the action with maximal action-value:
 $$ \pi(s) \doteq \argmax_a q(s,a) $$
