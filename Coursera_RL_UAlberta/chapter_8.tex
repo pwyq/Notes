@@ -49,7 +49,7 @@ The heart of both planning and learning methods is the estimation of value funct
 \begin{tcolorbox}[width=1.1\textwidth,title={Random-sample one-step tabular Q-\textbf{planning}}]
 Loop forever:
 
-$\quad$1. Select a state, $S \in \S$, and an action, $A \in \A(\S)$, at random
+$\quad$1. Select a state, $S \in S$, and an action, $A \in \A(S)$, at random
 
 $\quad$2. Send $S$, $A$ to a sample model, and obtain a sample next $R$, and $S'$
 
@@ -98,7 +98,7 @@ How does this differ from DP-value iteration? It does not \textbf{sweep} all sta
 The Dyna Q uses both real world experience (which is expensive) and simulated (hallucinated) experience (which is cheap; more iterations are completed with simulated experience), thus accelerating training. The real experience is for learning, and simulated experience is for planning.
 
 \begin{tcolorbox}[width=1.1\textwidth,title={Tabular Dyna-Q}]
-Init $Q(s,a)$ and $Model(s,a)$ for all $s \in \S$ and $a \in \A(s)$
+Init $Q(s,a)$ and $Model(s,a)$ for all $s \in S$ and $a \in \A(s)$
 
 Loop forever:
 

@@ -22,7 +22,7 @@ Chap 10 (control): an approximation to the optimal policy is found
 
 Chap 11: off-policy learning with function approximation
 
-Chap 12: \textit{eligibility traces}, which dramatically improves the computational properties of multi-step RL methods in many cases.s
+Chap 12: \textit{eligibility traces}, which dramatically improves the computational properties of multi-step RL methods in many cases.
 
 Chap 13 (control): \textit{policy-gradient}, a different approach to control, which approximates the optimal policy directly and need never form an approximate value function.
 
@@ -72,8 +72,7 @@ However, in RL, we require the methods are able to handle nonstationarity cases 
 
 \subsection{The Prediction Objective ($\overline{VE}$)}
 
-By assumption we have far more states than weights, so making one state's estimate more accurate invariably(always) means making others' less accurate. We need to find which states we care most about.
-
+By assumption we have far more states than weights, so making one state's estimate more accurate invariably(always) means making others' less accurate. We need to find which states we care most about. Therefore, we introduced the state distribution $\mu(s)$:
 \begin{definition}
 \textbf{state distribution $\mu(s)$}: $\mu \geq 0$, $\sum_s \mu(s) = 1$, representing how much we care about the error (square distance between approx value $\hat{v}(s,\bm{w})$ and true value $v_\pi(s)$) in each state $s$.
 \end{definition}
@@ -192,7 +191,7 @@ The TD update can be rewritten as the expected update + a noise term, so it is l
 \end{align*}
 
 \begin{definition}
-\textbf{TD Fixed Point $\bm{w}_{TD}$}, the weight is converged when the expected TD update = 0.
+\textbf{TD Fixed Point $\bm{w}_{TD}$}, the weight is converged when the expected TD update = 0. TD fixed point is the solution to the semi-gradient TD(0).
 $$\E[\Delta \bm{w}_{TD}] = \alpha(\bm{b} - \bm{A}\bm{w}_{TD}) = 0$$
 \end{definition}
 When $A$ is invertible, we can rewrite $\bm{w}_{TD} = \bm{A}^{-1}\bm{b}$. We say $\bm{w}_{TD}$ is a solution to this linear system; the solution is called TD fixed point.
@@ -344,7 +343,7 @@ A real-valued weight is associated with each link.
 
 The units in ANN are typically semi-linear units, meaning that they compute a weighted sum of their input signals and then apply to the result a nonlinear function (activation function). \textbf{Nonlinearity is essential}: if all the units have linear activation functions, the entire network is equivalent to a network without hidden layers (linear+linear = linear).
 
-An ANN with a single hidden layer containing a large enough finite number of sigmoid units can approximate any continuous function on a compact region of the network's input space to any degree of accuracy.
+\textbf{Universal Approximation Property} An ANN with a single hidden layer containing a large enough finite number of sigmoid units can approximate any continuous function on a compact region of the network's input space to any degree of accuracy.
 
 Training the hidden layers of an ANN is a way to auto create features appropriate for a given problem so that hierarchical representations can be produced w/o replying exclusively on hand-crafted features.
 

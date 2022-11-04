@@ -1,0 +1,76 @@
+\documentclass[lang=en,mode=geye,device=normal,color=blue,14pt]{elegantnote}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bbm}
+\usepackage{tcolorbox}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{subfigure}
+%\usepackage{subfig}
+\usepackage{subfiles}
+\usepackage{bm}
+\usepackage{pythonhighlight}
+
+\usepackage{xcolor}
+\definecolor{shadecolor}{RGB}{150,150,150}
+\newcommand{\mybox}[1]{\par\noindent\colorbox{shadecolor}
+{\parbox{\dimexpr\textwidth-2\fboxsep\relax}{#1}}}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+
+\urlstyle{same}
+
+\DeclareMathOperator*{\E}{\mathbb{E}}
+\DeclareMathOperator*{\A}{\mathcal{A}}
+%\DeclareMathOperator*{\S}{\mathcal{S}}
+\DeclareMathOperator*{\1}{\mathbbm{1}}
+\DeclareMathOperator*{\R}{\mathbbm{R}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\DeclareMathOperator*{\bx}{\mathbf{x}}
+\DeclareMathOperator*{\by}{\mathbf{y}}
+\DeclareMathOperator*{\bz}{\mathbf{z}}
+\DeclareMathOperator*{\bu}{\mathbf{u}}
+\DeclareMathOperator*{\bw}{\mathbf{w}}
+\DeclareMathOperator*{\bv}{\mathbf{v}}
+
+\DeclareMathOperator*{\bb}{\mathbf{b}}
+\DeclareMathOperator*{\bR}{\mathbb{R}}
+\DeclareMathOperator*{\bQ}{\mathbf{Q}}
+\DeclareMathOperator*{\bA}{\mathbf{A}}
+
+\title{Note: SLAM}
+
+\author{Yanqing Wu}
+%\institute{Viwistar Robotics}
+
+% \version{0.1.0}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\setlength{\parindent}{0pt}
+\tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\subfile{chapter_1.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\subfile{chapter_2.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliography{references.bib}
+
+\end{document}
