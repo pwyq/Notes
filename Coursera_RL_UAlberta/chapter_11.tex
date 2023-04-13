@@ -1,0 +1,36 @@
+\documentclass[sutton_barto_notes.tex]{subfiles}
+\begin{document}
+
+\newpage
+\section{Off-policy Methods with Approximation}
+
+\begin{itemize}
+\item The extension to function approximation is significantly different and difficult for off-policy learning, than it is for on-policy learning
+\item tabular off-policy methods
+\begin{itemize}
+	\item extend to semi-gradient algorithms
+	\item do not converge robustly compared to when they under on-policy trainings.
+\end{itemize}
+\item convergence problem
+\item notion of learnability
+\item introduce new algorithms for off-policy case with stronger convergence
+\item off-policy
+\begin{itemize}
+	\item prediction case: both $\pi$ and $b$ are static and given, we learn either $\hat{v} \approx v_\pi$ or $\hat{q}\approx q_\pi$.
+	\item control case: $\hat{q}$ are learned, $\pi$ and $b$ changes during learning.)
+\end{itemize}
+\item challenges
+\begin{itemize}
+\item (mismatched) target of the update (solution: importance sampling)
+\item (mismatched) distribution of the updates, like distribution shift in offline RL? (solution: (1) importance sampling; (2) true gradient methods)
+\end{itemize}
+\end{itemize}
+
+\subsection{Semi-gradient Methods}
+
+\paragraph{Rule} change from tabular form to semi-gradient form: replace (update to array/table $V,Q$) $\rightarrow$ (update to weight vector $\bm{w}$ using $\hat{v},\hat{q}$ and its gradient).
+
+\subsection{Examples of Off-policy Divergence}
+
+
+\end{document}

@@ -1,39 +1,9 @@
 \documentclass[sutton_barto_notes.tex]{subfiles}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 
 \newpage
-\section{Some Notes}
-
-\subsection{On-policy vs. Off-policy}
-
-These two concepts are introduced in Chapter 5.
-
-On-policy methods can be a special case of off-policy, where the target policy and behavior policy are the same.
-\begin{table}[h!]
-\begin{tabular}{@{}ll@{}}
-\toprule
-on-policy                       & off-policy                                                                                                                  \\ \midrule
-simpler, considered first       & greater variance, slower converge
-\\
-Agent can pick actions          & Agent can't pick actions                                                                                                    \\
-most obvious setup :)           & \begin{tabular}[c]{@{}l@{}}learning with exploration\\ playing without exploration\end{tabular}                             \\
-Agent always follows own policy & \begin{tabular}[c]{@{}l@{}}Learning from expert (expert is imperfect)\\ Learning from sessions (recorded data)\end{tabular} \\ \bottomrule
-\end{tabular}
-\end{table}
-
-% Please add the following required packages to your document preamble:
-% \usepackage{booktabs}
-\begin{table}[h!]
-\begin{tabular}{@{}lll@{}}
-\toprule
-             & on-policy                                                                                                                                   & off-policy                                                                          \\ \midrule
-value based  & \begin{tabular}[c]{@{}l@{}}Monte Carlo Learning\\ TD(0)\\ SARSA\\ Expected SARSA\\ n-Step TD/SARSA\\ TD(\textbackslash{}lamda)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Q-Learning\\ DQN\\ Double DQN\\ Dueling DQN\end{tabular} \\
-policy based & \begin{tabular}[c]{@{}l@{}}REINFORCE\\ REINFORCE with Advantage\end{tabular}                                                                &                                                                                     \\
-actor-critic & \begin{tabular}[c]{@{}l@{}}A3C\\ A2C\\ TRPO\\ PPO\end{tabular}                                                                              & \begin{tabular}[c]{@{}l@{}}DDPG\\ TD3\\ SAC\\ IMPALA\end{tabular}                   \\ \bottomrule
-\end{tabular}
-\end{table}
+\section{Random Notes}
 
 \subsection{argmax vs. max}
 

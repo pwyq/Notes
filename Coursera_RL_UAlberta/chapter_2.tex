@@ -5,8 +5,8 @@
 \newpage
 \section{Multi-armed Bandits}
 \begin{itemize}
-\item Evaluative: feedback depends solely on the taken action, indicating results
-\item Instructive: feedback is independent of the taken action, indicating correct actions
+\item Evaluative: feedback depends solely on the taken action, indicating results (in RL)
+\item Instructive: feedback is independent of the taken action, indicating correct actions (in SL)
 \item Nonassociative setting: no learning involved in more than one situation; no need to associate different actions with different situations/states
 \item Associative setting: the best action depends on the situation
 \end{itemize}
@@ -184,7 +184,7 @@ This is based on updating the preference values as such, after taking action $A_
 
 $$ H_{t+1}(A_t)\doteq H_t(A_t) + \alpha (R_t - \overline{R_t})(1-\pi_t(A_t)) $$
 
-$$ H_{t+1}(a) \doteq H_t(a) - \alpha(R_t - \overline{R_t})\pi_t(a)\quad\text{for all }a\neq sA_t $$
+$$ H_{t+1}(a) \doteq H_t(a) - \alpha(R_t - \overline{R_t})\pi_t(a)\quad\text{for all }a\neq A_t $$
 
 $\overline{R_t} \in \R $ is the average of the rewards up to but not including time $t$ (with $\overline{R_1} = R_1$)
 
@@ -215,7 +215,7 @@ This chapter presented several ways to balance exploration and exploitation:
 \begin{itemize}
 \item $\varepsilon$-greedy methods choose randomly among actions a small fraction of the time to encourage exploration
 \item UCB methods choose deterministically but favouring actions with uncertain estimates
-\item Gradient methods don't estimate action values, but preferences, and choose actions probabilistically according to the preferences
+\item Gradient methods don't estimate action values (no interpretation on rewards), but preferences, and choose actions probabilistically according to the preferences
 \item Optimistic initialization sets optimistic initial $Q$ values in order to encourage a very active exploration in the initial phase, leading to a fast convergence with no bias
 \end{itemize}
 
@@ -223,6 +223,14 @@ There is no method among the above that is best. Common ways to assess performan
 \begin{itemize}
 \item learning curve: shows the performance of an algorithm vs. iterations for a certain parameter setting
 \item parameter studies: summarize each algorithm by the average reward over the first 1000 steps, and show such a value for various parameter settings and algorithms.
+\end{itemize}
+
+Associative search (contextual bandits)
+\begin{itemize}
+\item extend nonassociative bandit problem to the associative setting
+\item at each time step, the bandit is different
+\item learn a different policy for different bandits 
+\item prepare for the full RL problems
 \end{itemize}
 
 One should also consider the sensitivity to parameter setting, that is an indication of \textbf{robustness}.
@@ -289,7 +297,7 @@ $$Q_{n+1} = Q_n + \frac{1}{n}[R_n - Q_n]$$
 
 7. Understand why we might use a constant stepsize in the case of non-stationarity
 
-Use a constant stepsize makes the agent able to adapt to changing environment.
+Use a constant stepsize makes the agent able to adapt to changing (nonstationary) environment.
 If we use 1/N(a) as stepsize in non-stationary cases, when the true values change suddenly in long steps, the 1/N(a) may be very small and can hardly learn the new values.
 
 Lesson 3: Exploration vs. Exploitation Tradeoff
@@ -326,7 +334,7 @@ We always select the action with highest (most optimistic) UCB. When the action 
 
 15. Different constant step size and decaying step size
 
-A larger step size moves us more quickly toward the true value, but can make our estimated values oscillate around the expected value. A step size that reduces over time can converge to close to the expected value, without oscillating. On the other hand, such a decaying stepsize is not able to adapt to changes in the environment. Nonstationarity---and the related concept of partial observability---is a common feature of reinforcement learning problems and when learning online
+A larger step size moves us more quickly toward the true value, but can make our estimated values oscillate around the expected value. A step size that reduces over time can converge to close to the expected value, without oscillating. On the other hand, such a decaying stepsize is not able to adapt to changes in the environment. Nonstationarity---and the related concept of partial observability---is a common feature of reinforcement learning problems and when learning online.
 
 
 \end{document}

@@ -1,0 +1,95 @@
+\documentclass[sutton_barto_notes.tex]{subfiles}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\newpage
+\section{Things to consider for an algorithm}
+
+\subsection{associative vs. non-associative}
+
+\subsection{stationary vs. non-stationary}
+
+\subsection{unbiased vs. biased}
+
+learning curve, parameter setting (robustness)
+
+ability to learn
+
+initialization (easy / hard) how?
+
+update rule
+
+memory computation
+
+complexity
+
+convergence guarantee
+
+\subsection{online vs. offline}
+
+\subsection{short term vs. long term}
+
+\subsection{exploitation vs. exploration}
+
+\subsection{constant vs. non-constant step-size parameters}
+
+\subsection{partial observability}
+
+related to non-stationary
+
+\subsection{episodic vs. continuing tasks}
+
+finite vs. infinite
+
+size of state / actions / reward space
+
+\subsection{deterministic vs. stochastic policy}
+
+\subsection{linear vs. nonlinear function approximation}
+
+\subsection{exact (tabular) vs. approximate solution}
+
+\subsection{discrete vs. continuous}
+
+space / task
+
+\subsection{expected vs. sampled return}
+
+\subsection{forward vs. backward view}
+
+\subsection{prediction vs. control}
+
+Q: do control algorithms always use state-action pairs?
+
+\subsection{On-policy vs. Off-policy}
+
+These two concepts are introduced in Chapter 5.
+
+On-policy methods can be a special case of off-policy, where the target policy and behavior policy are the same.
+\begin{table}[h!]
+\begin{tabular}{@{}ll@{}}
+\toprule
+on-policy                       & off-policy                                                                                                                  \\ \midrule
+simpler, considered first       & greater variance, slower converge
+\\
+Agent can pick actions          & Agent can't pick actions                                                                                                    \\
+most obvious setup :)           & \begin{tabular}[c]{@{}l@{}}learning with exploration\\ playing without exploration\end{tabular}                             \\
+Agent always follows own policy & \begin{tabular}[c]{@{}l@{}}Learning from expert (expert is imperfect)\\ Learning from sessions (recorded data)\end{tabular} \\ \bottomrule
+\end{tabular}
+\end{table}
+
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+\begin{table}[h!]
+\begin{tabular}{@{}lll@{}}
+\toprule
+             & on-policy                                                                                                                                   & off-policy                                                                          \\ \midrule
+value based  & \begin{tabular}[c]{@{}l@{}}Monte Carlo Learning\\ TD(0)\\ SARSA\\ Expected SARSA\\ n-Step TD/SARSA\\ TD(\textbackslash{}lamda)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Q-Learning\\ DQN\\ Double DQN\\ Dueling DQN\end{tabular} \\
+policy based & \begin{tabular}[c]{@{}l@{}}REINFORCE\\ REINFORCE with Advantage\end{tabular}                                                                &                                                                                     \\
+actor-critic & \begin{tabular}[c]{@{}l@{}}A3C\\ A2C\\ TRPO\\ PPO\end{tabular}                                                                              & \begin{tabular}[c]{@{}l@{}}DDPG\\ TD3\\ SAC\\ IMPALA\end{tabular}                   \\ \bottomrule
+\end{tabular}
+\end{table}
+
+
+\end{document}

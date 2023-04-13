@@ -264,7 +264,7 @@ v_\pi(s) & \doteq \E_\pi[G_t | S_t = s]\\
 \end{align*}
 
 Equation of $q_\pi$ in terms of $v_\pi$ and the four argument $p$
-$$ q_\pi(s,a) = \sum_{s', r} p(s',r|s,a) \underbrace{ [r+\gamma v_\pi(s')] }_{G_t?} $$
+$$ q_\pi(s,a) = \sum_{s', r} p(s',r|s,a) [r+\gamma v_\pi(s')] $$
 
 \begin{definition}
 Monte Carlo methods, estimation methods that involve averaging over many random samples of actual returns.
@@ -322,7 +322,7 @@ Solving a RL means finding a policy that achieves a lot of reward over the long 
 \begin{definition}
 optimal policy, $\pi_*$
 
-$$ \pi_* \geq \pi' \iff v_\pi(s) \geq v_{\pi'}(s), \quad \forall s \in \mathcal{S} $$
+$$ \pi \geq \pi' \iff v_\pi(s) \geq v_{\pi'}(s), \quad \forall s \in \mathcal{S} $$
 \end{definition}
 An optimal policy is defined as the policy with the highest possible value function in all states. At least one (deterministic) optimal policy always exists, but there may be more than one. The exponential number of possible policies makes searching for the optimal policy by brute-force intractable.
 
@@ -458,13 +458,15 @@ MDP consists of states, actions and rewards. MDP state must have Markov property
 The dynamics of an MDP is the transition probability $p(s',r|s,a)$.
 
 3. Understand the graphical representation of a Markov Decision Process
+
 4. Explain how many diverse processes can be written in terms of the MDP framework
 
 From my understanding, almost all real world problems can be written in MDP framework. The issue is that reward definition sometimes may not be accurate, and states, actions may not be finite.
 
 5. Describe how rewards relate to the goal of an agent
 
-The reward is a way of imparting to the agent what you want to achieved, not how you want to achieved.
+The goal of the agent is to maximize cumulative reward in the long run. In addition,
+The reward is a way of imparting to the agent what goal want to achieved, not how you want to achieved the goal.
 
 6. Understand episodes and identify episodic tasks
 
@@ -581,7 +583,7 @@ and
 $$100+110=210$$
 Thus, now the first policy is better.
 
-In the continuous case, the episodes always have length $K=\inf$. Therefore, they always have the same lenght, and adding a constant does not change anything, because the second term in $R_c$ stays the same.
+In the continuous case, the episodes always have length $K=\inf$. Therefore, they always have the same length, and adding a constant does not change anything, because the second term in $R_c$ stays the same.
 
 29. $\gamma$ specifies the problem set. Once we have set the $\gamma$, we need to find the solution, so we do not want the agent to change the $\gamma$.
 

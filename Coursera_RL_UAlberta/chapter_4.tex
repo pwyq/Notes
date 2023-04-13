@@ -123,7 +123,7 @@ Greedy policy $\pi'(s)$:
 \end{align*}
 
 \begin{definition}
-policy improvement, the process of making a new policy $\pi'$ that improves on an original policy $\pi$, by making it greedy w.r.t the value function of $\pi$.
+policy improvement, the process of making a new policy $\pi'$ that improves on an original policy $\pi$, by making it \textbf{greedy} w.r.t the value function of $\pi$.
 \end{definition}
  
 If there are ties in policy improvement steps, each maximizing action can be given a portion of the probability of being selected in the new greedy policy.
@@ -389,6 +389,15 @@ DP, in the worst case, the time takes to find an optimal solution is polynomial 
 \item \textbf{bootstrapping}: update estimates on the basis of other estimates (English definition of bootstrap: you pull yourself up by your boot-straps, meaning you achieved success by your own efforts.)
 \end{itemize}
 
+\begin{table}[]
+\begin{tabular}{l|l|l}
+Problem                 & Bellman equation                                                                                    & Algorithm                   \\\hline
+Prediction (evaluation) & Bellman Expectation Equation                                                                        & Iterative policy evaluation \\
+Control                 & \begin{tabular}[c]{@{}l@{}}Bellman Expectation Equation + \\ Greedy Policy Improvement\end{tabular} & Policy Iteration            \\
+Control                 & Bellman Optimality Equation                                                                         & Value Iteration            
+\end{tabular}
+\end{table}
+
 \newpage
 \subsection{Learning Objectives (UA RL MOOC)}
 
@@ -445,7 +454,7 @@ MC estimates state value by averaging large number of returns.
 
 15. Understand the advantage of Dynamic programming and “bootstrapping” over these alternative strategies for finding the optimal policy
 
-DP is fast and boostrapping uses more states' info during estimation than the other alternatives, which is more efficient.
+DP is fast and bootstrapping uses more states' info during estimation than the other alternatives, which is more efficient.
 
 16. Why are DP algorithms considered planning methods?
 

@@ -24,6 +24,106 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
+
+
+
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage{amsthm,bm}
+\usepackage{latexsym}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{xcolor}
+
+\usepackage[mathscr]{euscript}
+
+\DeclareMathOperator*{\ba}{\mathbf{a}}
+\DeclareMathOperator*{\bb}{\mathbf{b}}
+\DeclareMathOperator*{\bc}{\mathbf{c}}
+\DeclareMathOperator*{\bd}{\mathbf{d}}
+\DeclareMathOperator*{\be}{\mathbf{e}}
+%\DeclareMathOperator*{\bf}{\mathbf{f}}
+\DeclareMathOperator*{\bg}{\mathbf{g}}
+\DeclareMathOperator*{\bh}{\mathbf{h}}
+\DeclareMathOperator*{\bi}{\mathbf{i}}
+\DeclareMathOperator*{\bj}{\mathbf{j}}
+\DeclareMathOperator*{\bk}{\mathbf{k}}
+\DeclareMathOperator*{\bl}{\mathbf{l}}
+%\DeclareMathOperator*{\bm}{\mathbf{m}}
+\DeclareMathOperator*{\bn}{\mathbf{n}}
+\DeclareMathOperator*{\bo}{\mathbf{o}}
+\DeclareMathOperator*{\bp}{\mathbf{p}}
+\DeclareMathOperator*{\bq}{\mathbf{q}}
+\DeclareMathOperator*{\br}{\mathbf{r}}
+\DeclareMathOperator*{\bs}{\mathbf{s}}
+\DeclareMathOperator*{\bt}{\mathbf{t}}
+\DeclareMathOperator*{\bu}{\mathbf{u}}
+\DeclareMathOperator*{\bv}{\mathbf{v}}
+\DeclareMathOperator*{\bw}{\mathbf{w}}
+\DeclareMathOperator*{\bx}{\mathbf{x}}
+\DeclareMathOperator*{\by}{\mathbf{y}}
+\DeclareMathOperator*{\bz}{\mathbf{z}}
+\DeclareMathOperator*{\bA}{\mathbb{A}}
+\DeclareMathOperator*{\bB}{\mathbb{B}}
+\DeclareMathOperator*{\bC}{\mathbb{C}}
+\DeclareMathOperator*{\bD}{\mathbb{D}}
+\DeclareMathOperator*{\bE}{\mathbb{E}}
+\DeclareMathOperator*{\bF}{\mathbb{F}}
+\DeclareMathOperator*{\bG}{\mathbb{G}}
+\DeclareMathOperator*{\bH}{\mathbb{H}}
+\DeclareMathOperator*{\bI}{\mathbb{I}}
+\DeclareMathOperator*{\bJ}{\mathbb{J}}
+\DeclareMathOperator*{\bK}{\mathbb{K}}
+\DeclareMathOperator*{\bL}{\mathbb{L}}
+\DeclareMathOperator*{\bM}{\mathbb{M}}
+\DeclareMathOperator*{\bN}{\mathbb{N}}
+\DeclareMathOperator*{\bO}{\mathbb{O}}
+\DeclareMathOperator*{\bP}{\mathbb{P}}
+\DeclareMathOperator*{\bQ}{\mathbb{Q}}
+\DeclareMathOperator*{\bR}{\mathbb{R}}
+\DeclareMathOperator*{\bS}{\mathbb{S}}
+\DeclareMathOperator*{\bT}{\mathbb{T}}
+\DeclareMathOperator*{\bU}{\mathbb{U}}
+\DeclareMathOperator*{\bV}{\mathbb{V}}
+\DeclareMathOperator*{\bW}{\mathbb{W}}
+\DeclareMathOperator*{\bX}{\mathbb{X}}
+\DeclareMathOperator*{\bY}{\mathbb{Y}}
+\DeclareMathOperator*{\bZ}{\mathbb{Z}}
+\DeclareMathOperator*{\cA}{\mathcal{A}}
+\DeclareMathOperator*{\cB}{\mathcal{B}}
+\DeclareMathOperator*{\cC}{\mathcal{C}}
+\DeclareMathOperator*{\cD}{\mathcal{D}}
+\DeclareMathOperator*{\cE}{\mathcal{E}}
+\DeclareMathOperator*{\cF}{\mathcal{F}}
+\DeclareMathOperator*{\cG}{\mathcal{G}}
+\DeclareMathOperator*{\cH}{\mathcal{H}}
+\DeclareMathOperator*{\cI}{\mathcal{I}}
+\DeclareMathOperator*{\cJ}{\mathcal{J}}
+\DeclareMathOperator*{\cK}{\mathcal{K}}
+\DeclareMathOperator*{\cL}{\mathcal{L}}
+\DeclareMathOperator*{\cM}{\mathcal{M}}
+\DeclareMathOperator*{\cN}{\mathcal{N}}
+\DeclareMathOperator*{\cO}{\mathcal{O}}
+\DeclareMathOperator*{\cP}{\mathcal{P}}
+\DeclareMathOperator*{\cQ}{\mathcal{Q}}
+\DeclareMathOperator*{\cR}{\mathcal{R}}
+\DeclareMathOperator*{\cS}{\mathcal{S}}
+\DeclareMathOperator*{\cT}{\mathcal{T}}
+\DeclareMathOperator*{\cU}{\mathcal{U}}
+\DeclareMathOperator*{\cV}{\mathcal{V}}
+\DeclareMathOperator*{\cW}{\mathcal{W}}
+\DeclareMathOperator*{\cX}{\mathcal{X}}
+\DeclareMathOperator*{\cY}{\mathcal{Y}}
+\DeclareMathOperator*{\cZ}{\mathcal{Z}}
+\DeclareMathOperator*{\btheta}{\bm{\theta}}
+%\def\Tau{{\rm T}}
+\newcommand{\Tau}{\mathscr{T}}
+
+
+
+
+
 \title{Notes of Reinforcement Learning: An Introduction}
 
 \author{Yanqing Wu}
@@ -79,8 +179,9 @@
 
 \subfile{chapter_10.tex}
 
-\newpage
-\section{Off-policy Methods with Approximation}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\subfile{chapter_11.tex}
 
 \newpage
 \section{Eligibility Traces}
@@ -90,7 +191,22 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subfile{chapter_extra_notes.tex}
+\newpage
+\section{Psychology (skip)}
+\section{Neuroscience (skip)}
+\section{Application and Case Studies (skip)}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\subfile{chapter_17.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\subfile{chapter_things_to_consider.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\subfile{chapter_random_notes.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -5,9 +5,12 @@
 \newpage
 \section{Monte Carlo Methods}
 
+First \textit{learning} method for estimating value functions and discovering optimal policies. Here we don't have any knowledge of the environment dynamics, we learn only by experience.
+
 MC, is for estimating value functions and discovering optimal policies. Unlike methods in previous chapters, MC does not use complete knowledge of the environment. MC only requires \textit{experience} - sample sequences of states, actions and rewards from actual or simulated interaction with an environment. That is, MC is a \textbf{model-free} learning method.
 
-MC is based on averaging \textbf{complete sample returns}. Since we are considering sampling returns, we define MC only for episodic tasks (in this book) \footnote{We can never sample an actual return value in continuous tasks. We may get around by using artificial time horizon, or TD (with eligibility traces); however, all these incur bias. see \url{https://datascience.stackexchange.com/a/77789/137431}}. Once an episode ends, the value estimates and policies change. \textbf{MC is thus a episode-by-episode update}, not a step-by-step (online) update.
+MC is based on averaging \textbf{complete sample returns}. Since we are considering sampling returns, we define MC only for episodic tasks (in this book) \footnote{We can never sample an actual return value in continuous tasks. We may get around by using artificial time horizon, or TD (with eligibility traces); however, all these incur bias. see \url{https://datascience.stackexchange.com/a/77789/137431}}. Once an episode ends, the value estimates and policies change.
+\textbf{MC is thus an episode-by-episode update}, not a step-by-step (online) update.
 
 The procedure of MC is similar to DP: prediction problem (finding $v_\pi$ and $q_\pi$) -> policy improvement -> control problem (solve by GPI). Except that, in DP, we compute value functions based on model, here we learn value functions from sample returns.
 
@@ -71,7 +74,7 @@ Advantage of MC over DP: (1) no need the model (i.e. the transition dynamics); (
 
 \subsection{Monte Carlo Estimation of Action Values}
 
-When without a model, $v(s)$ along cannot determine $\pi$; in this case, $q(s,a)$ is more useful. Thus, one of MC goals is to estimate $q_*$.
+When without a model, $v(s)$ along cannot determine $\pi$ (because for $v(s)$, we need to do a one-step lookahead, which needs the model, i.e, transition probability $p(s',r|s,a)$); in this case, $q(s,a)$ is more useful. Thus, one of MC goals is to estimate $q_*$.
 
 The only problem is that many $(s,a)$ pairs may never be visited. For example, if we have a deterministic policy we only get one action per state (the one that the policy favor). Hence, we only observe returns for one action. This is a problem of \textbf{maintaining exploration}.
 One way to solve this is exploring starts.
@@ -122,6 +125,16 @@ The policy evaluation part is done exactly as described in the previous section 
 
 The policy improvement part is done by taking greedy actions in each state. That is, for any action-value function $q$, and for every state $s$, the greedy policy chooses the action with maximal action-value:
 $$ \pi(s) \doteq \argmax_a q(s,a) $$
+
+To ensure the guarantee of convergence for MC, we made two unlikely assumptions:
+\begin{itemize}
+\item exploring start (not useful in real world interaction, some starting conditions aren't helpful)
+\item policy evaluation on infinite number of episodes.
+\begin{itemize}
+	\item soln 1: approximates $q_{\pi_k}$ in each policy evaluation. Making bounds.
+	\item soln 2: early stop of policy evaluation. Example: value iteration (or in-place value iteration)
+\end{itemize}
+\end{itemize}
 
 \subsection{Monte Carlo Control without Exploring Starts}
 
@@ -234,6 +247,62 @@ Note after canceling the transition probabilities, the importance sampling ratio
 $$\E_b[X\rho(x)] = \sum_{x \in X} x \rho(x) b(x) \approx \frac{1}{n}\sum_{i=1}^n x_i \rho_i (x), x_i \sim b\quad \text{(by def of $\E$)}$$
 All we have from the behavior policy are returns $G_t$, we can use these returns to estimates $v_b(s) = \E [G_t | S_t = s]$, but not $v_\pi$. To adjust for the difference between $v_b$ and $v_\pi$, we apply importance sampling ratio $\rho$:
 $$ v_\pi(s) = \E [ \rho_{t:T-1} G_t | S_t = s] $$
+
+The ordinary IS formula:
+$$ V(s) \doteq \frac{\sum_{t \in \Tau (s)} \rho_{t:T(t)-1} G_t }{ | \Tau(s) |} $$
+where $\Tau(s)$ is the set of all time steps in every episode where state $s$ has been visited. $T(t)$ is the first time of termination after timestep $t$, and $G(t)$ is the return after the $t$ to $T(t)$ trajectory from behavior policy.
+
+The weighted IS is:
+$$ V(s) \doteq \frac{ \sum_{t \in \Tau (s)} \rho_{t:T(t)-1} G_t }{ \sum_{t \in \Tau (s)} \rho_{t:T(t)-1} } $$
+
+To understand the difference, consider the estimates after observing a single return:
+\begin{itemize}
+\item for the weighted average, the ratio cancels out, and the estimate is equal to the return observed from behavior policy. It is a reasonable estimate but its expectation is $v_b(s)$ rather than $v_\pi(s)$, so it's biased.
+\item for the ordinary IS, the expectation is $v_\pi(s)$, so it's not biased but it can be a bit extreme. If the trajectory is 10 times more likely under $\pi$ than under $b$, the estimate would be 10 times than the observed return, which would be far from the actual observed return. Note that the variance for the ordinary estimate can be unbounded (\textit{infinite variance}).
+\end{itemize}
+
+\subsection{Incremental Implementation}
+We want to implement those MC prediction methods on an episode-by-episode basis.
+
+To do this, we will take inspiration from Chapter 2.4 where we incrementally computed Q estimates. For the on-policy method, the only difference is that here we average returns whereas in Chapter 2 we averaged rewards. For off-policy method, we need to distinguish between ordinary importance sampling and weighted importance sampling.
+
+In ordinary IS, the returns are scaled by the importance sampling ratio, then simply averaged using ordinary IS formula:
+$$ V(s) \doteq \frac{\sum_{t \in \Tau (s)} \rho_{t:T(t)-1} G_t }{ | \Tau(s) |} $$
+For these methods, we can use the incremental methods from chapter 2, but using the scaled returns instead of reward.
+
+For weighted IS, we have to form a weighted average of the returns, and use a slightly different incremental algorithm.
+
+Suppose we have a sequence of returns $G_1, G_2, \dots, G_{n-1}$, all starting in the same state and each with a corresponding random weight $W_i$ (for example $\rho_{t:T(t)-1}$). We wish to form the estimate (for $n\geq 2$):
+$$ V_n \doteq \frac{\sum_{k=1}^{n-1} W_k G_k }{ \sum_{k=1}^{n-1} W_k } $$
+and keep it up to date as we obtain a single additional return $G_n$. In addition to keeping track of $V_n$, we must maintain for each state the cumulative sum $C_n$ of the weights given to the first $n$ returns. The update rule for $V_n (n \geq 1)$ is 
+$$ V_{n+1} \doteq V_n + \frac{W_n}{C_n} [G_n - V_n] $$
+and
+$$ C_{n+1} \doteq C_n + W_{n+1} $$
+
+A complete pseudocode is on the book pg 110.
+
+
+\subsection{Off-policy Monte Carlo Control}
+
+In this book, we consider two classes of learning control methods:
+\begin{itemize}
+\item on-policy methods: estimate the value of a policy while using it for control
+\item off-policy methods: these two functions are separated (target vs. behavior policies)
+\end{itemize}
+
+Off-policy MC control follow the behavior policy while learning about improving the target policy. A complete pseudocode is on book pg 111.
+
+A potential problem is that the method only learns from the tails of episodes, when all of the remaining actions are greedy. If non-greedy actions are common, then learning will be slow, particularly for states appearing in early portions of long episodes.
+
+Maybe incorporating TD-learning can help. Also if $\gamma \leq 1$, TD can help.
+
+\subsection{Discounting-aware Importance Sampling}
+idea: use partial termination (early break), up to horizon $h$, to reduce variance in off-policy methods.
+
+flat partial return
+\subsection{Per-decision Importance Sampling}
+Similar ideas as discounting-aware, i.e., ignore irrelevant factors to reduce variance.
+It has the version for ordinary IS; it is unbiased and has lower variance. It is unclear if there exists weighted per-decision IS.
 
 \subsection{Summary}
 

@@ -10,7 +10,7 @@ TD learning is a learning method that's specialized for prediction learning (the
 The TD error is the difference between two predictions, the temporal difference; otherwise TD learning is the same as supervised learning, backpropagating the error.
 You can think one step TD (make a prediction, wait one step, see the result) as traditional supervised learning (supervisor tells you the result after one step).
 
-Note prediction problem means policy evaluation, control problem means finding $\pi_*$.
+Note prediction problem means policy evaluation (find $v_\pi$ or $q_\pi$ for a fixed policy $\pi$), control problem means finding $\pi_*$.
 
 TD combines some of the features of both MC and DP. TD does not require a model and can learn from interactions (like MC), and TD can bootstrap, thus learn online (without waiting till the end of episodes) (like DP).
 
