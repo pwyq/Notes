@@ -22,7 +22,7 @@ Consider estimate $v_\pi$ from sample episodes generated using $\pi$
 \end{itemize}
 \begin{figure}[h!]
     \centering
-    \subfigure[]{\includegraphics[width=0.8\textwidth]{nstep_diagram.png}}
+     \includegraphics[width=0.8\textwidth]{nstep_diagram.png}
     \caption{ Backup diagrams for n-step methods }
 \end{figure}
 Still TD: we bootstrap because we change an earlier estimate based on how it differs from a later estimate (only that the later estimate is now n steps later)
@@ -61,7 +61,7 @@ V_{t+n}(S_t) \doteq V_{t+n-1}(S_t) + \alpha[G_t^{(n)} - V_{t+n-1}(S_t)] \label{e
 
 \begin{figure}[h!]
     \centering
-    \subfigure[]{\includegraphics[width=0.8\textwidth]{nstep_algo.png}}
+     \includegraphics[width=0.8\textwidth]{nstep_algo.png}
     \caption{ n-step TD algorithm }
 \end{figure}
 
@@ -78,7 +78,7 @@ We use this to type of graph to show the effect of n
 
 \begin{figure}[h!]
     \centering
-    \subfigure[]{\includegraphics[width=0.8\textwidth]{nstep_graph.png}}
+     \includegraphics[width=0.8\textwidth]{nstep_graph.png}
     \caption{ Performance of n-step TD methods as a function of $\alpha$ }
 \end{figure}
 
@@ -104,12 +104,12 @@ The values of all other states remain unchanged, $Q_{t+n}(s,a) = Q_{t+n-1}(s,a)$
 
 \begin{figure}[h!]
     \centering
-    \subfigure[]{\includegraphics[width=0.8\textwidth]{nstep_sarsa_algo.png}}
+     \includegraphics[width=0.8\textwidth]{nstep_sarsa_algo.png}
     \caption{ n-step SARSA }
 \end{figure}
 \begin{figure}[h!]
     \centering
-    \subfigure[]{\includegraphics[width=0.8\textwidth]{nstep_sarsa.png}}
+     \includegraphics[width=0.8\textwidth]{nstep_sarsa.png}
     \caption{ n-step SARSA backup diagram }
 \end{figure}
 
@@ -146,7 +146,7 @@ Note that the IS ratio here starts one step later than from $n$-step TD because 
 
 \begin{figure}[h!]
     \centering
-    \subfigure[]{\includegraphics[width=0.8\textwidth]{nstep_sarsa_offpolicy.png}}
+     \includegraphics[width=0.8\textwidth]{nstep_sarsa_offpolicy.png}
     \caption{ n-step SARSA off-policy algorithm }
 \end{figure}
 
@@ -211,7 +211,7 @@ for $t < h < T$.
 Off-policy without IS: Q-learning and Expected SARSA do it for the one-step case. Here, we present a multi-step algorithm: \textbf{the tree backup algorithm}.
 
 \begin{figure}[h!]
-    \subfigure[]{\includegraphics[width=0.1\textwidth]{nstep_tree.png}}
+     \includegraphics[width=0.1\textwidth]{nstep_tree.png}
     \caption{ n-step tree }
 \end{figure}
 A 3-step tree backup diagram
@@ -253,7 +253,7 @@ Q_{t+n}(S_t, A_t) \gets Q_{t+n-1}(S_t, A_t)  + \alpha \big(G_{t:t+n} - Q_{t+n-1}
 
 \begin{figure}[h!]
     \centering
-    \subfigure[]{\includegraphics[width=0.8\textwidth]{nstep_tree_backup.png}}
+     \includegraphics[width=0.8\textwidth]{nstep_tree_backup.png}
     \caption{ n-step tree backup algorithm }
 \end{figure}
 
@@ -263,7 +263,7 @@ Q_{t+n}(S_t, A_t) \gets Q_{t+n-1}(S_t, A_t)  + \alpha \big(G_{t:t+n} - Q_{t+n-1}
 So far we have considered 3 different kinds of action-value algorithms, the first 3 of the figure:
 \begin{figure}[h!]
     \centering
-    \subfigure[]{\includegraphics[width=0.8\textwidth]{nstep_diagrams.png}}
+     \includegraphics[width=0.8\textwidth]{nstep_diagrams.png}
     \caption{ n-step backup diagrams. The $rho$'s indicate half transitions on which IS is required in the off-policy case }
 \end{figure}
 \begin{itemize}
@@ -297,7 +297,7 @@ Once this return is well defined, we can plug it into the usual $n$-step SARSA u
 
 \begin{figure}[h!]
     \centering
-    \subfigure[]{\includegraphics[width=0.8\textwidth]{nstep_qsigma.png}}
+     \includegraphics[width=0.8\textwidth]{nstep_qsigma.png}
     \caption{ n-step Q($\sigma$) }
 \end{figure}
 
