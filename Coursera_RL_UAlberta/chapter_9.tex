@@ -31,19 +31,19 @@ Chap 13 (control): \textit{policy-gradient}, a different approach to control, wh
 
 We start consider using function approximation in estimating the state-value function from on-policy data, which approximates $v_\pi$ from experience generated using a known policy $\pi$.
 
-The approximate value function is represented as a parameterized functional form with weight vector $\bm{w} \in \R^d$, instead of a table.
-We write $\hat{v}(s,\bm{w}) \approx v_\pi(s)$ for the approximate value of state $s$ given weight vector $\bm{w}$.
+The approximate value function is represented as a parameterized functional form with weight vector ${\bw} \in \R^d$, instead of a table.
+We write $\hat{v}(s,{\bw}) \approx v_\pi(s)$ for the approximate value of state $s$ given weight vector ${\bw}$.
 
 For example,
 \begin{itemize}
-\item $\hat{v}$ = linear function in features of the state, $\bm{w}$ = vector of feature weights
-\item $\hat{v}$ = function computed by a multi-layer ANN, $\bm{w}$ = vector of connection weights in all the layers
-\item $\hat{v}$ = function computed by a decision tree, $\bm{w}$ = all the numbers defining the split points and leaf values of the tree
+\item $\hat{v}$ = linear function in features of the state, ${\bw}$ = vector of feature weights
+\item $\hat{v}$ = function computed by a multi-layer ANN, ${\bw}$ = vector of connection weights in all the layers
+\item $\hat{v}$ = function computed by a decision tree, ${\bw}$ = all the numbers defining the split points and leaf values of the tree
 \end{itemize}
 
 Typically, the number of weights is much less than the number of states ($d <<|S|$), and one weight takes care of many states.
 
-Extending RL to function approximation also makes it applicable to partially observable problems (in which the full state is not available to the agent).
+Extending RL to function approximation also makes it applicable to partially observable problems (POMDP) (in which the full state is not available to the agent).
 
 All theoretical results for methods using function approximation apply equally well to cases of partial observability.
 
@@ -52,45 +52,64 @@ Function approximation cannot augment the state representation with memories of 
 \subsection{Value-function Approximation}
 
 \begin{definition}
-\textbf{individual update notation}: $s \rightarrow u$ (the book uses $|->$, where $s$ is the state updated and $u$ is the update target. The estimated value for $s$ should be more like $u$.
+\textbf{individual update notation}: $s \mapsto u$ (where $s$ is the state updated and $u$ is the update target. The estimated value for $s$ should be more like $u$.
 \end{definition}
 
 \begin{itemize}
-\item MC: $S_t \rightarrow G_t$
-\item TD(0): $S_t \rightarrow R_{t+1} + \gamma \hat{v}(S_{t+1},\bm{w}_t)$
-\item n-step TD: $S_t \rightarrow G_{t:t+n}$
-\item DP: $s \rightarrow \E_\pi [R_{t+1} + \gamma \hat{v}(S_{t+1}, \bm{w}_t) | S_t = s]$
+\item MC: $S_t \mapsto G_t$
+\item TD(0): $S_t \mapsto R_{t+1} + \gamma \hat{v}(S_{t+1},{\bw}_t)$
+\item n-step TD: $S_t \mapsto G_{t:t+n}$
+\item DP: $s \mapsto \E_\pi [R_{t+1} + \gamma \hat{v}(S_{t+1}, {\bw}_t) | S_t = s]$
 \end{itemize}
 
 We want to extend a one-to-one mapping to one-to-many mapping, i.e., updating $s$ will also update many other states.
 
 Supervised learning methods learn to mimic input-output examples, and when the outputs are numbers, like $u$, the process is often called \textit{function approximation}.
-We use these methods for value prediction simply by passing to them the $s \rightarrow u$ of each update as a training example.
+We use these methods for value prediction simply by passing to them the $s \mapsto u$ of each update as a training example.
 
 In principle, we can use any method for supervised learning from examples, including ANN, decision trees, and various kinds of multivariate regression.
 However, in RL, we require the methods are able to handle nonstationarity cases as RL agents need to do online learning (interact with the environment to obtain data).
 
 \subsection{The Prediction Objective ($\overline{VE}$)}
 
-By assumption we have far more states than weights, so making one state's estimate more accurate invariably(always) means making others' less accurate. We need to find which states we care most about. Therefore, we introduced the state distribution $\mu(s)$:
+Assumptions for tabular setting:
+
+\begin{itemize}
+\item no need to specify an explicit objective for the prediction because the learned value will approx the true value
+\item an update at one state does not affect any other state
+\end{itemize}
+
+Now the assumptions do not hold. Making one state's estimate more accurate invariably(always) means making others' less accurate. We need to find which states we care most about. Therefore, we introduced the state distribution $\mu(s)$:
 \begin{definition}
-\textbf{state distribution $\mu(s)$}: $\mu \geq 0$, $\sum_s \mu(s) = 1$, representing how much we care about the error (square distance between approx value $\hat{v}(s,\bm{w})$ and true value $v_\pi(s)$) in each state $s$.
+\textbf{state distribution $\mu(s)$}: $\mu \geq 0$, $\sum_s \mu(s) = 1$, representing how much we care about the error (square distance between approx value $\hat{v}(s,{\bw})$ and true value $v_\pi(s)$) in each state $s$.
 \end{definition}
 
 Since we are doing on-policy policy evaluation, the $\mu$ is from policy $\pi$. We can also design $\mu$, then it becomes off-policy prediction.
 
 \begin{definition}
 \textbf{Mean Squared Value Error ($\overline{VE}$)}: a natural objective function,
-$$\overline{VE}(\bm{w}) \doteq \sum_{s\in S} \underbrace{\mu(s)}_{\text{weight}} \underbrace{[v_\pi(s) - \hat{v}(s,\bm{w})]^2}_{\text{error}}$$
+$$\overline{VE}({\bw}) \doteq \sum_{s\in S} \underbrace{\mu(s)}_{\text{weight}} \underbrace{[v_\pi(s) - \hat{v}(s,{\bw})]^2}_{\text{error}}$$
 \end{definition}
 
 Often $\mu(s)$ is chosen to be the fraction of time spent in $s$. Under on-policy training, this is called \textit{on-policy distribution}. In continuing tasks, the on-policy distribution is the stationary distribution under $\pi$. The book talks about the episodic tasks (not including here).
 
 !! NOTE that the RL community is not sure if $\overline{VE}$ is the right performance objective for RL. But this is the best we can find so far. Adam White: VE might not be the best because we are only approximating the exact true values. Instead, we can use Average reward + Policy Gradient methods for control.
 
+\subsubsection{on-policy distribution}
+
+In continuting tasks, the on-policy distribution is the stationary distribution under $\pi$.
+
+In episodic tasks, it depends on how the initial states of episodes are chosen.
+\begin{itemize}
+\item $h(s)$ = prob. that an episode begins in each state $s$
+\item $\eta(s)$ = average num. of time steps spent in state $s$ in single episode
+\end{itemize}
+$$ \eta(s) = h(s) + \sum_{\bar(s)} \eta(\bar{s}) \sum_a \pi(a| \bar{s}) p(s| \bar{s}, a), \forall s \in \mathcal{S} $$
+$$ \mu(s) = \frac{\eta(s)}{\sum_{s'} \eta(s')}, \forall s \in \mathcal{S} $$
+
 \subsection{Stochastic-gradient and Semi-gradient Methods}
 
-In GD, the weight vector is a column vector with a fixed number of real valued components, $\bm{w} \doteq (w_1, w_2, ..., w_d)^T $, and the approximate value function $\hat{v}(s,\bm{w})$ is a differentiable function of $\bm{w}$ for all $s \in S$. However, no $\bm{w}$ can gets all the states in real world.
+In GD, the weight vector is a column vector with a fixed number of real valued components, ${\bw} \doteq (w_1, w_2, ..., w_d)^T $, and the approximate value function $\hat{v}(s,{\bw})$ is a differentiable function of ${\bw}$ for all $s \in S$. However, no ${\bw}$ can gets all the states in real world.
 
 \paragraph{GD vs SGD} In both GD and SGD, we update a set of parameters in an iterative manner to minimize an error function.
 \begin{itemize}
@@ -98,21 +117,24 @@ In GD, the weight vector is a column vector with a fixed number of real valued c
 \item SGD: we run through ONLY ONE or a SUBSET of samples to do the update. If we use a SUBSET, it is called Minibatch Stochastic Gradient Descent.
 \end{itemize}
 
-The solution to $\bm{w}$ is SGD: we minimize error on the \textit{observed samples}. The weight vector of SGD is:
-$$ \bm{w}_{t+1} \doteq \bm{w} - \frac{1}{2}\alpha \nabla [v_\pi(S_t) - \hat{v}(S_t, \bm{w}_t)]^2$$
-$$ \bm{w}_{t+1} = \bm{w} + \alpha[v_\pi(S_t) - \hat{v}(S_t, \bm{w}_t)]\nabla \hat{v}(S_t, \bm{w}_t) $$
+The solution to ${\bw}$ is SGD: we minimize error on the \textit{observed samples}. The weight vector of SGD is:
+$$ {\bw}_{t+1} \doteq {\bw} - \frac{1}{2}\alpha \nabla [v_\pi(S_t) - \hat{v}(S_t, {\bw}_t)]^2$$
+$$ {\bw}_{t+1} = {\bw} + \alpha[v_\pi(S_t) - \hat{v}(S_t, {\bw}_t)]\nabla \hat{v}(S_t, {\bw}_t) $$
 
 Now we consider when we do not have the exact true value $v_\pi(S_t)$, but an approximate value $U_t$. Then
-$$ \bm{w}_{t+1} = \bm{w} + \alpha[U_t - \hat{v}(S_t, \bm{w}_t)]\nabla \hat{v}(S_t, \bm{w}_t) $$
+$$ {\bw}_{t+1} = {\bw} + \alpha[U_t - \hat{v}(S_t, {\bw}_t)]\nabla \hat{v}(S_t, {\bw}_t) $$
 
-If $U_t$ is an \textit{unbiased} estimate ($\E[U_t|S_t=s]=v_\pi(s)$), then $\bm{w}_t$ is guaranteed to converge to a local optimum under the usual stochastic approximation conditions (chap2). For example, Monte Carlo target $U_t\doteq G_t$ is an unbiased estimate of $v_\pi(S_t)$.
+If $U_t$ is an \textit{unbiased} estimate ($\E[U_t|S_t=s]=v_\pi(s)$), then ${\bw}_t$ is guaranteed to converge to a local optimum under the usual stochastic approximation conditions (chap2). For example, Monte Carlo target $U_t\doteq G_t$ is an unbiased estimate of $v_\pi(S_t)$.
+
+\textbf{convergence} to a local optimum is guaranteed depending on $\alpha$.
+
 
 \begin{tcolorbox}[width=1.1\textwidth,title={Gradient Monte Carlo for Estimating $\hat{v}\approx v_\pi$}]
 Input: $\pi$ to be evaluated, a differentiable function $\hat{v}:S\times\R^d \rightarrow \R$
 
 Parameter: $\alpha > 0$
 
-Init the value-function weights $\bm{w} \in \R^d$ arbitrarily
+Init the value-function weights ${\bw} \in \R^d$ arbitrarily
 
 Loop forever (for each episode):
 
@@ -122,19 +144,20 @@ $\quad$Loop for each step of episode, $t = 0,1,...,T-1$:
 
 $\quad$Take action $A$; observe resultant reward, $R$, and state, $S'$
 
-$\quad\quad$ $\bm{w} \leftarrow \bm{w} + \alpha [ G_t - \hat{v}(S_t, \bm{w})]\nabla \hat{v}(S_t, \bm{w})$
+$\quad\quad$ ${\bw} \leftarrow {\bw} + \alpha [ G_t - \hat{v}(S_t, {\bw})]\nabla \hat{v}(S_t, {\bw})$
 \end{tcolorbox}
 
-On the other hand, Bootstrapping targets, such as $n$-step returns $G_{t:t+n}$ or the DP target, all depend on the current value of the weight vector $\bm{w}_t$, which implies that they will be biased. These are not the true gradient-descent methods, but $semi$-gradient methods.
 
-Although semi-gradient (bootstrapping) methods do not converge as robustly as true gradient methods, they offer important advantages: (1) enable much faster learning; (2) enable learning to be continual and online; (3) provides computational advantages. A typical semi-gradient method is semi-gradient TD(0), which uses $U_t \doteq R_{t+1} + \gamma \hat{v}(S_t, \bm{w})$
+On the other hand, Bootstrapping targets, such as $n$-step returns $G_{t:t+n}$ or the DP target, all depend on the current value of the weight vector ${\bw}_t$, which implies that they will be biased. These are not the true gradient-descent methods, but $semi$-gradient methods.
+
+Although semi-gradient (bootstrapping) methods do not converge as robustly as true gradient methods, they offer important advantages: (1) enable much faster learning; (2) enable learning to be continual and online; (3) provides computational advantages. A typical semi-gradient method is semi-gradient TD(0), which uses $U_t \doteq R_{t+1} + \gamma \hat{v}(S_t, {\bw})$
 
 \begin{tcolorbox}[width=1.1\textwidth,title={Semi-gradient TD(0) for Estimating $\hat{v}\approx v_\pi$}]
 Input: $\pi$ to be evaluated, a differentiable function $\hat{v}:S\times\R^d \rightarrow \R$ where $\hat{v}(terminal,\dot)=0$
 
 Parameter: $\alpha > 0$
 
-Init the value-function weights $\bm{w} \in \R^d$ arbitrarily
+Init the value-function weights ${\bw} \in \R^d$ arbitrarily
 
 Loop for each episode:
 
@@ -142,18 +165,18 @@ $\quad$Init $S$
 
 $\quad$Loop for each step of episode:
 
-$\quad\quad$Choose $A$~$\pi(\dot | S)$
+$\quad\quad$Choose $A$~$\pi(\cdot | S)$
 
 $\quad\quad$Take action $A$; observe reward, $R$, and state, $S'$
 
-$\quad\quad$ $\bm{w} \leftarrow \bm{w} + \alpha [ R + \gamma \hat{v}(S_t, \bm{w}) - \hat{v}(S,\bm{w})]\nabla \hat{v}(S_t, \bm{w})$
+$\quad\quad$ ${\bw} \leftarrow {\bw} + \alpha [ R + \gamma \hat{v}(S_t, {\bw}) - \hat{v}(S,{\bw})]\nabla \hat{v}(S_t, {\bw})$
 
 $\quad\quad S \leftarrow S'$
 
 $\quad$until $S$ is terminal
 \end{tcolorbox}
 
-The target $U_t$ in semi-gradient methods is biased, so the $\bm{w}$ may not converge to a local optimum.
+The target $U_t$ in semi-gradient methods is biased, so the ${\bw}$ may not converge to a local optimum.
 
 
 
@@ -163,47 +186,47 @@ The target $U_t$ in semi-gradient methods is biased, so the $\bm{w}$ may not con
 
 \subsection{Linear Methods}
 
-One of the most important special cases of function approximation is that, $\hat{v}(\dot, \bm{w})$ is a linear function of the weight vector $\bm{w}$. Corresponding to every state $s$, there is a real-valued vector $\bm{x}(s)\doteq (x_1(s),x_2(s),...,x_d(s))^T$, with the same number of components as $\bm{w}$.
+One of the most important special cases of function approximation is that, $\hat{v}(\dot, {\bw})$ is a linear function of the weight vector ${\bw}$. Corresponding to every state $s$, there is a real-valued vector ${\bx}(s)\doteq (x_1(s),x_2(s),...,x_d(s))^T$, with the same number of components as ${\bw}$.
 
-Linear methods approximate the state-value function by the inner product between $\bm{w}$ and $\bm{x}(s)$:
-$$\hat{v}(s,\bm{w}) \doteq \bm{w}^T\bm{x}(s)\doteq \sum_{i=1}^d w_i x_i(s) $$
+Linear methods approximate the state-value function by the inner product between ${\bw}$ and ${\bx}(s)$:
+$$\hat{v}(s,{\bw}) \doteq {\bw}^T{\bx}(s)\doteq \sum_{i=1}^d w_i x_i(s) $$
 
-The vector $\bm{x}(s)$ is a \textit{feature vector} representing state $s$. Each component $x_i(s)$ is a \textit{feature}.
+The vector ${\bx}(s)$ is a \textit{feature vector} representing state $s$. Each component $x_i(s)$ is a \textit{feature}.
 
-The gradient of the approximation value function w.r.t $\bm{w}$ is then $\nabla\hat{v}(s,\bm{w})=\bm{x}(s)$.
+The gradient of the approximation value function w.r.t ${\bw}$ is then $\nabla\hat{v}(s,{\bw})={\bx}(s)$.
 Thus, we can simplify the general SGD update to
-$$\bm{w}_{t+1} = \bm{w} + \alpha[U_t - \hat{v}(S_t, \bm{w}_t)]\bm{x}(s)$$
+$${\bw}_{t+1} = {\bw} + \alpha[U_t - \hat{v}(S_t, {\bw}_t)]{\bx}(s)$$
 
 \paragraph{Understand the fixed point of linear TD learning}
 
-Let us start with TD update with linear function approximation on the first line, recall the value of a state $\hat{v}(s,\bm{w}) \doteq \bm{w}^T\bm{x}(s)$
+Let us start with TD update with linear function approximation on the first line, recall the value of a state $\hat{v}(s,{\bw}) \doteq {\bw}^T{\bx}(s)$
 \begin{align*}
-\bm{w}_{t+1} &\doteq \bm{w} + \alpha[R_{t+1} + \gamma\hat{v}(S_{t+1},\bm{w}_t) - \hat{v}(S_t, \bm{w}_t)]\bm{x}(S_t) \\
-&= \bm{w} + \alpha[R_{t+1} + \gamma\hat{v}(S_{t+1},\bm{w}_t) - \hat{v}(S_t, \bm{w}_t)]\bm{x}_t \quad \text{simplify notation}\\
-&= \bm{w} + \alpha[R_{t+1} + \gamma\bm{w}_t^T\bm{x}_{t+1} - \bm{w}_t^T\bm{x}_t]\bm{x}_t \quad \text{due to }\hat{v}(s,\bm{w}) \doteq \bm{w}^T\bm{x}(s)\\
-&= \bm{w} + \alpha[\underbrace{R_{t+1}\bm{x}_t}_{\bm{b}} - \underbrace{\bm{x}_t(\bm{x}_t - \gamma\bm{x}_{t+1})^T}_{\bm{A}}\bm{w}_t] \quad\text{transpose doesn't change scalar}\\
+{\bw}_{t+1} &\doteq {\bw} + \alpha[R_{t+1} + \gamma\hat{v}(S_{t+1},{\bw}_t) - \hat{v}(S_t, {\bw}_t)]{\bx}(S_t) \\
+&= {\bw} + \alpha[R_{t+1} + \gamma\hat{v}(S_{t+1},{\bw}_t) - \hat{v}(S_t, {\bw}_t)]{\bx}_t \quad \text{simplify notation}\\
+&= {\bw} + \alpha[R_{t+1} + \gamma{\bw}_t^T{\bx}_{t+1} - {\bw}_t^T{\bx}_t]{\bx}_t \quad \text{due to }\hat{v}(s,{\bw}) \doteq {\bw}^T{\bx}(s)\\
+&= {\bw} + \alpha[\underbrace{R_{t+1}{\bx}_t}_{\bm{b}} - \underbrace{{\bx}_t({\bx}_t - \gamma{\bx}_{t+1})^T}_{\bm{A}}{\bw}_t] \quad\text{transpose doesn't change scalar}\\
 \end{align*}
 The TD update can be rewritten as the expected update + a noise term, so it is largely dominated by the behavior of the expected update.
 \begin{align*}
-\E[\Delta \bm{w}_t] &= \alpha(\bm{b} - \bm{A}\bm{w}_t) \\
-\bm{b} &= \E[R_{t+1}\bm{x}_t] \\
-\bm{A} &= \E[\bm{x}_t(\bm{x}_t - \gamma\bm{x}_{t+1})^T] \quad \text{expct. over features}
+\E[\Delta {\bw}_t] &= \alpha(\bm{b} - \bm{A}{\bw}_t) \\
+\bm{b} &= \E[R_{t+1}{\bx}_t] \\
+\bm{A} &= \E[{\bx}_t({\bx}_t - \gamma{\bx}_{t+1})^T] \quad \text{expct. over features}
 \end{align*}
 
 \begin{definition}
-\textbf{TD Fixed Point $\bm{w}_{TD}$}, the weight is converged when the expected TD update = 0. TD fixed point is the solution to the semi-gradient TD(0).
-$$\E[\Delta \bm{w}_{TD}] = \alpha(\bm{b} - \bm{A}\bm{w}_{TD}) = 0$$
+\textbf{TD Fixed Point ${\bw}_{TD}$}, the weight is converged when the expected TD update = 0. TD fixed point is the solution to the semi-gradient TD(0).
+$$\E[\Delta {\bw}_{TD}] = \alpha(\bm{b} - \bm{A}{\bw}_{TD}) = 0$$
 \end{definition}
-When $A$ is invertible, we can rewrite $\bm{w}_{TD} = \bm{A}^{-1}\bm{b}$. We say $\bm{w}_{TD}$ is a solution to this linear system; the solution is called TD fixed point.
+When $A$ is invertible, we can rewrite ${\bw}_{TD} = \bm{A}^{-1}\bm{b}$. We say ${\bw}_{TD}$ is a solution to this linear system; the solution is called TD fixed point.
 
-$\bm{w}_{TD}$ minimizes an objective that is based on this $\bm{A}$ and $\bm{b}$. This objective extends the connection between TD and Bellman equations to the function approximation setting.
+${\bw}_{TD}$ minimizes an objective that is based on this $\bm{A}$ and $\bm{b}$. This objective extends the connection between TD and Bellman equations to the function approximation setting.
 
 Recall in the tabular setting, TD is described as a sample based method for solving the Bellman equation. Linear TD similarly approximates the solution to the Bellman equation, minimizing what is called the projected Bellman error.
 
 \paragraph{Describe a theoretical guarantee on the mean squared value error at the TD fixed point}
 
 We want to understand the relationship between the solution found by TD and the minimum value error solution.
-$$\overline{VE}(\bm{w}_{TD}) \leq \frac{1}{1-\gamma}min_{\bm{w}}\overline{VE}(\bm{w})$$
+$$\overline{VE}({\bw}_{TD}) \leq \frac{1}{1-\gamma}min_{{\bw}}\overline{VE}({\bw})$$
 The difference between these two errors depends on $\gamma$ and the quality of features.
 
 Why isn't the TD fixed point error equal to the minimum value error solution? This is because bootstrapping under function approximation. If our function approximator is good, then our estimate of the next state will be accurate.
@@ -213,7 +236,7 @@ Input: $\pi$ to be evaluated, a differentiable function $\hat{v}:S\times\R^d \ri
 
 Parameter: $\alpha > 0$, $n > 0$
 
-Init the value-function weights $\bm{w} \in \R^d$ arbitrarily
+Init the value-function weights ${\bw} \in \R^d$ arbitrarily
 
 All store and access operations ($S_t$ and $R_t$) can their index mod $n+1$
 
@@ -239,9 +262,9 @@ $\quad\quad$If $\tau \geq 0$:
 
 $\quad\quad\quad G \leftarrow \sum_{i=\tau + 1}^{min(\tau+n,T)} \gamma^{i-\tau-1}R_i$
 
-$\quad\quad\quad$If $\tau + n < T$, then: $G\leftarrow G+\gamma^n \hat{v} (S_{\tau + n}, \bm{w})$
+$\quad\quad\quad$If $\tau + n < T$, then: $G\leftarrow G+\gamma^n \hat{v} (S_{\tau + n}, {\bw})$
 
-$\quad\quad\quad \bm{w} \leftarrow \bm{w} + \alpha [G - \hat{v}(S_{\tau},\bm{w})]\nabla \hat{v}(S_{\tau},\bm{w})$
+$\quad\quad\quad {\bw} \leftarrow {\bw} + \alpha [G - \hat{v}(S_{\tau},{\bw})]\nabla \hat{v}(S_{\tau},{\bw})$
 
 $\quad$until $\tau = T-1$
 \end{tcolorbox}
@@ -262,11 +285,11 @@ Linear methods,
 
 The features used to construct value estimates, are one of the most important parts of a RL agent.
 
-Recall linear value function approximation $v_\pi(s) \approx \hat{v}(s,\bm{w}) = \bm{w}^T\bm{x}(s)$. Recall that a tabular representation can be expressed as a binary (0 or 1) feature vector. Each state is associated with a different feature. Agent-presented state is 1, all other features are 0. The tabular case is a special case of linear function approximation, where the feature vector is an indicator/one-hot encoding of the state.
+Recall linear value function approximation $v_\pi(s) \approx \hat{v}(s,{\bw}) = {\bw}^T{\bx}(s)$. Recall that a tabular representation can be expressed as a binary (0 or 1) feature vector. Each state is associated with a different feature. Agent-presented state is 1, all other features are 0. The tabular case is a special case of linear function approximation, where the feature vector is an indicator/one-hot encoding of the state.
 
 This becomes a problem when the feature space is large. Recall that we can use state aggregation to associate nearby states with the same features.
 
-From state aggregation to coarse coding: although state aggregation can have arbitrary shapes, but it does not allow overlapping. We can remove this restriction, and we have coarse coding. Therefore, coarse coding is a generalization of state aggregation.
+From state aggregation to coarse coding: although state aggregation can have arbitrary shapes, but it does not allow \textbf{overlapping}. We can remove this restriction, and we have coarse coding. Therefore, coarse coding is a generalization of state aggregation.
 
 \begin{definition}
 \textbf{binary feature}: 1-0 valued feature, 1 for present, 0 for absent.
@@ -327,6 +350,11 @@ Another useful trick of reducing memory requirements is \textit{hashing} (Like o
 
 \subsection{Selecting Step-Size Parameters Manually}
 
+$$ \alpha \doteq (\tau \bE [ {\bx}^T \bx] )^{-1} $$
+where $\tau$ is the number of experience, and $\bx$ is the random feature vector.
+
+See Ex 9.5
+
 \subsection{Nonlinear Function Approximation: Artificial Neural Networks}
 
 !! Note that neural network, like coarse coding/tile coding, is also a way of feature representation. State aggregation, coarse coding and tile coding are fixed representation. NN are flexible representation (due to learning)
@@ -374,11 +402,11 @@ Methods for reducing overfitting / improve training
 \item step 2: find the parameters which minimize this loss function
 \end{itemize}
 
-Suppose we have input layer $\bm{s}$, hidden layer $\bm{x}$, output layer $\bm{y}$, input-hidden weight $\bm{A}$, hidden-output weight $\bm{B}$.
+Suppose we have input layer $\bm{s}$, hidden layer ${\bx}$, output layer $\bm{y}$, input-hidden weight $\bm{A}$, hidden-output weight $\bm{B}$.
 
 \begin{itemize}
-\item $\bm{x} \doteq f_A(\bm{\psi})$, $\bm{\psi} \doteq \bm{s}\bm{A}$
-\item $\bm{\hat{y}} \doteq f_B(\bm{\theta})$, $\bm{\theta} = \bm{x}\bm{B}$
+\item ${\bx} \doteq f_A(\bm{\psi})$, $\bm{\psi} \doteq \bm{s}\bm{A}$
+\item $\bm{\hat{y}} \doteq f_B(\bm{\theta})$, $\bm{\theta} = {\bx}\bm{B}$
 \end{itemize}
 
 Gradient w.r.t $\bm{B}$:
@@ -388,10 +416,10 @@ Gradient w.r.t $\bm{B}$:
 &= \underbrace{\frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \hat{\bm{y_k}}}\frac{\partial f_{\bm{B}}(\theta_k)}{\partial\theta_k}}_{\delta_k^{\bm{B}}} \bm{x_j}
 \end{align*}
 
-Note that the weight $\bm{A}$ also affect $\bm{x}$, so a chain rule set up is needed here. Gradient w.r.t $\bm{A}$:
+Note that the weight $\bm{A}$ also affect ${\bx}$, so a chain rule set up is needed here. Gradient w.r.t $\bm{A}$:
 \begin{align*}
-\frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \bm{A_{ij}}} &= \delta_k^{\bm{B}} \frac{\partial\theta_k}{\partial\bm{A}_{ij}} & \frac{\partial\theta_k}{\partial\bm{A}_{ij}} = \bm{B}_{jk}\frac{\partial \bm{x}_j}{\partial \bm{A}_{ij}} \\
-&= \delta_k^{\bm{B}} \bm{B}_{jk}\frac{\partial \bm{x}_j}{\partial \bm{A}_{ij}} & \frac{\partial \bm{x}_j}{\partial \bm{A}_{ij}} = \frac{\partial f_{\bm{A}}(\psi_j) }{\partial \psi_j} \frac{\partial \psi_j}{\partial \bm{A}_{ij}} \\
+\frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \bm{A_{ij}}} &= \delta_k^{\bm{B}} \frac{\partial\theta_k}{\partial\bm{A}_{ij}} & \frac{\partial\theta_k}{\partial\bm{A}_{ij}} = \bm{B}_{jk}\frac{\partial {\bx}_j}{\partial \bm{A}_{ij}} \\
+&= \delta_k^{\bm{B}} \bm{B}_{jk}\frac{\partial {\bx}_j}{\partial \bm{A}_{ij}} & \frac{\partial {\bx}_j}{\partial \bm{A}_{ij}} = \frac{\partial f_{\bm{A}}(\psi_j) }{\partial \psi_j} \frac{\partial \psi_j}{\partial \bm{A}_{ij}} \\
 &= \delta_k^{\bm{B}} \bm{B}_{jk} \frac{\partial f_{\bm{A}}(\psi_j) }{\partial \psi_j} \frac{\partial \psi_j}{\partial \bm{A}_{ij}} \\
 &= \underbrace{\delta_k^{\bm{B}}\bm{B}_{jk} \frac{\partial f_{\bm{A}}(\psi_j) }{\partial \psi_j}}_{\delta_j^{\bm{A}}} \bm{s}_i
 \end{align*}
@@ -405,7 +433,7 @@ for each i/o pair $(s,y)$ in dataset:
 
 $\quad\delta_k^{\bm{B}} = \frac{\partial L(\hat{\bm{y_k}}, \bm{y_k})}{\partial \hat{\bm{y_k}}}\frac{\partial f_{\bm{B}}(\theta_k)}{\partial\theta_k}$
 
-$\quad\nabla_{\bm{B}}^{jk}=\delta_k^{\bm{B}}\bm{x}_j$
+$\quad\nabla_{\bm{B}}^{jk}=\delta_k^{\bm{B}}{\bx}_j$
 
 $\quad\bm{B} = \bm{B} - \alpha_{\bm{B}}\nabla_{\bm{B}}$
 
@@ -417,21 +445,105 @@ $\quad\bm{A} = \bm{A} - \alpha_{\bm{A}}\nabla_{\bm{A}}$
 \end{tcolorbox}
 First get prediction $\hat{y}$ (forward pass), then compute the gradients backwards from the output. Specifically, we first compute $\delta_{\bm{B}}$ and the gradient for B, then we use this gradient to update the parameters $\bm{B}$, the step size $\alpha_{\bm{B}}$. Next we update the parameters $\bm{A}$, we compute $\delta_{\bm{A}}$ which uses $\delta_{\bm{B}}$. Notice that by computing the gradients backwards, we avoid re-computing the same terms; In fact, this is the main idea behind backpropgation: it is simple GD with efficient strategy to compute gradients.
 
+\subsection{Least-Squares TD}
+
+-> Direct computation of the TD fixed point, instead of the iterative method.
+
+Recall that TD(0) with linear FA converges asymptotically to the TD fixed point:
+$$ {\bx}_{TD} \doteq \mathbf{A}^{-1}{\bb} $$
+
+\begin{itemize}
+\item $\mathbf{b} \doteq \mathbb{E}[R_{t+1} \mathbf{x}_t]$ 
+\item $\mathbf{A} \doteq \mathbb{E} \big[ \mathbf{x}_t(\mathbf{x}_t - \gamma \mathbf{x}_{t+1})^T\big]$ 
+\end{itemize}
+
+ The Least Squares TD Algorithm (LSTD) computes directly estimates for $\mathbf{A}$ and $\mathbf{b}$: 
+
+\begin{itemize}
+\item $\hat{\mathbf{b}}_t \doteq \sum_{k=0}^{t-1} R_{t+1} \mathbf{x}_k$ 
+\item $\hat{\mathbf{A}}_t \doteq \sum_{k=0}{t-1} \mathbf{x}_k(\mathbf{x}_k - \gamma \mathbf{x}_{k+1})^T + \varepsilon \mathbf{I}$ 
+\end{itemize}
+
+ where: 
+\begin{itemize}
+\item $\mathbf{I}$ is the identity matrix 
+\item $\varepsilon \mathbf{I}$ ensures that $\hat{\mathbf{A}}$ is always invertible 
+\end{itemize}
+
+ It seems that these estimates should be divided $t - 1$ and they should, but we don’t care because when we use them we effectively divide one by another. 
+
+ LSTD estimates the fixed point as: 
+$$ \mathbf{w}_{t} \doteq \hat{\mathbf{A}}_t^{-1}\hat{\mathbf{b}}_t $$
+
+ Complexity 
+\begin{itemize}
+\item The computation involves the inverse of A, so complexity $O(d^3)$ 
+\item Fortunately our matrix has a special form of the sum of outer products, so the inverse can be computed incrementally with only $O(d^2)$. This is using the Sherman-Morrisson formula 
+\item Still less efficient than the $O(d)$ of incremental version, but can be handy depending on how large d is. 
+\end{itemize}
+
+\subsection{Memory-Based Function Approximation}
+
+\begin{itemize}
+\item parametric approach (prev. discussed): training examples is (1) used to update the parameters; (2) then discarded
+\item memory-based approach: stores training example w/o updating the parameters. If a value update is needed, some examples is taken from the storage, and then discarded.
+\end{itemize}
+
+Some examples: nearest neighbor, weighted average, locally weighted regression
+
+properties of memory-based methods
+\begin{itemize}
+\item no limit of functional form
+\item more data = more accuracy
+\item experience effect more immediate to neighboring states
+\item retrieving neighboring states can be long, if there are many data in memory
+\end{itemize}
+
+\subsection{Kernel based Function Approximation}
+
+kernel = kernel function = $k(s,s')$, measures the strength of the generalization between $s$ and $s'$.
+
+kernel regression = memory-based method, that computes a kernel weighted average of all examples in storage
+
+$$ \hat{v}(s, \cD) = \sum_{s'\in \cD} k(s,s') g (s') $$
+where $\cD$ is example storage, $g(s')$ is target value for a stored state $s'$.
+
+Common kernel:
+\begin{itemize}
+\item Gaussian radial basis function
+\item in practice, $k(s,s') = \bx(s)^T \bx(s')$
+\end{itemize}
+
+\subsection{Looking deeper at on-policy learning: Interest and Emphasis}
+
+problem: we treat all states equally important. we are interests in some states than others, how to distinguish them?
+
+The on-policy distribution is defined as the distribution of states encountered in the MDP while following the target policy. Generalization: Rather than having one policy for the MDP, we will have many. All of them are a distribution of states encountered in trajectories using the target policy, but they vary in how the trajectories are initiated.
+
+\textbf{Interest} ($I_t$) = how much we are interested in evaluating $s$ at time $t$.
+
+\textbf{Emphasis} ($M_t$) = non-negative scalar multiplies the learning update and thus emphasizes or de-emphaizes the learning done at time $t$.
+$$ M_t = I_t + \gamma^n M_{t-n} $$
+
+ (TODO: this feels like a concept from the Optimization course, interest and momentum)
+
+
+\newpage
 \subsection{Learning Objectives (UA RL MOOC)}
 
 Lesson 1: Estimating Value Functions as Supervised Learning 
 
 1. Understand how we can use parameterized functions to approximate value functions 
 
-$\hat{v}(s, \bm{w})$
+$\hat{v}(s, {\bw})$
 
 2. Explain the meaning of linear value function approximation 
 
-$\hat{v}(s, \bm{w}) = \sum w_i x_i(s)$
+$\hat{v}(s, {\bw}) = \sum w_i x_i(s)$
 
 3. Recognize that the tabular case is a special case of linear value function approximation. 
 
-Consider each state has a corresponding vector (one-hot encoding)
+Consider each state has a corresponding feature (one-hot encoding)
 
 4. Understand that there are many ways to parameterize an approximate value function 
 
@@ -453,7 +565,7 @@ Because we want generalization to speed up learning, and discrimination to disti
 
 8. Understand how value estimation can be framed as a supervised learning problem 
 
-Supervised learning involves approximating a function given a dataset of (input, target) pairs. For Monte-Carlo $(S_t, G_t)$. For TD $(S_t, R_t+\gamma\hat{v}(S_t, \bm{w}))$
+Supervised learning involves approximating a function given a dataset of (input, target) pairs. For Monte-Carlo $(S_t, G_t)$. For TD $(S_t, R_t+\gamma\hat{v}(S_t, {\bw}))$
 
 9. Recognize not all function approximation methods are well suited for reinforcement learning 
 
@@ -464,7 +576,7 @@ Lesson 2: The Objective for On-policy Prediction
 10. Understand the mean-squared value error objective for policy evaluation 
 
 We cannot guarantee perfect approximation for every state's value, so we need to define an objective, a measure of the distance between our approximation and the true values.
-$$\overline{VE}(\bm{w}) \doteq \sum_{s\in\S} \underbrace{\mu(s)}_{\text{weight}} \underbrace{[v_\pi(s) - \hat{v}(s,\bm{w})]^2}_{\text{error}}$$
+$$\overline{VE}({\bw}) \doteq \sum_{s\in\S} \underbrace{\mu(s)}_{\text{weight}} \underbrace{[v_\pi(s) - \hat{v}(s,{\bw})]^2}_{\text{error}}$$
 
 11. Explain the role of the state distribution in the objective 
 
@@ -515,7 +627,7 @@ TD can learn during the episode and has a lower variance update.
 Lesson 4: Linear TD 
 
 21. Derive the TD-update with linear function approximation 
-$$\bm{w}_{t+1} = \bm{w} + \alpha[U_t - \hat{v}(S_t, \bm{w}_t)]\bm{x}(s)$$
+$${\bw}_{t+1} = {\bw} + \alpha[U_t - \hat{v}(S_t, {\bw}_t)]{\bx}(s)$$
 
 22. Understand that tabular TD(0) is a special case of linear semi-gradient TD(0)
 
@@ -601,14 +713,15 @@ If we choose a bad init parameters, we either have zero gradient or stuck in loc
 38. Describe strategies for initializing neural networks 
 
 \textbf{Method I}: randomly sample the initial weights from a normal distribution with small variance, and normalize the weights.
-$$\bm{w}_{init}\sim \frac{N(0,1)}{\sqrt{n_{inputs}}}$$
+$${\bw}_{init}\sim \frac{N(0,1)}{\sqrt{n_{inputs}}}$$
 This way, each neuron has a different output from other neurons within its layer. This provides a more diverse set of potential features. By keeping the variants small, we ensure that the output of each neuron is within the same range as its neighbors. By normalizing the weights, we prevent larger variance as number of neurons grows.
 
 Adam Algorithm are Method II + Method III.
+
 \textbf{Method II}: Update Momentum $M$
 \begin{align*}
-\bm{w}_{t+1} &\leftarrow \bm{w}_t - \alpha \nabla_{\bm{w}}L(\bm{w}_t)+\lambda M_t \\
-M_{t+1} &\leftarrow \lambda M_t - \alpha \nabla_{\bm{w}}L
+{\bw}_{t+1} &\leftarrow {\bw}_t - \alpha \nabla_{{\bw}}L({\bw}_t)+\lambda M_t \\
+M_{t+1} &\leftarrow \lambda M_t - \alpha \nabla_{{\bw}}L
 \end{align*}
 The momentum term summarizes the history of the gradients using a decaying sum of gradients with decay rate $\lambda$. If recent updates in the same direction, then we have large momentum, making larger step; if recent updates in the opposite direction, then we kill the momentum.
 

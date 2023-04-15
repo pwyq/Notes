@@ -10,8 +10,6 @@ TD learning is a learning method that's specialized for prediction learning (the
 The TD error is the difference between two predictions, the temporal difference; otherwise TD learning is the same as supervised learning, backpropagating the error.
 You can think one step TD (make a prediction, wait one step, see the result) as traditional supervised learning (supervisor tells you the result after one step).
 
-Note prediction problem means policy evaluation (find $v_\pi$ or $q_\pi$ for a fixed policy $\pi$), control problem means finding $\pi_*$.
-
 TD combines some of the features of both MC and DP. TD does not require a model and can learn from interactions (like MC), and TD can bootstrap, thus learn online (without waiting till the end of episodes) (like DP).
 
 TD($\lambda$) unifies DP, MC, TD.
@@ -70,8 +68,8 @@ TD methods combine the sampling of MC with the bootstrapping of DP.
 TD and MC updates are \textit{sample update} because they involve looking ahead to a sample successor state.
 
 \begin{itemize}
-\item sample update: based on a single sample successor
-\item expected update: a complete distribution of all possible successors
+\item \textbf{sample update}: based on a single sample successor
+\item \textbf{expected update}: a complete distribution of all possible successors
 \end{itemize}
 
 \begin{definition}
@@ -79,7 +77,7 @@ TD and MC updates are \textit{sample update} because they involve looking ahead 
 $$\delta_t \doteq \underbrace{R_{t+1} + \gamma V(S_{t+1})}_\text{TD Target} - V(S_t)$$
 \end{definition}
 
-MC error can be written as a sum of TD errors (think of it this way, TD updates immediately at each time step, MC updates after an episode (which include a lot of timesteps)
+If the array $V$ does not change during the episode, MC error can be written as a sum of TD errors (think of it this way, TD updates immediately at each time step, MC updates after an episode (which include a lot of timesteps)
 
 \begin{align*}
 \text{MC error} = G_t - V(S_t) &= \underbrace{R_{t+1}+\gamma G_{t+1}}_{G_t} - V(S_t) + \gamma V(S_{t+1}) - \gamma V(S_{t+1}) \\
@@ -90,11 +88,14 @@ MC error can be written as a sum of TD errors (think of it this way, TD updates 
 
 \subsection{Advantages of TD Prediction Methods}
 
-TD methods have an advantage over DP methods in that they do not require a model of the environment.
+\begin{itemize}
+\item they do not require a model of the environment.
+\item online, fully incremental updates (no delay, no waiting for the end of the episode like MC)
+\item for a fixed policy $\pi$, TD(0) has been shown to converge to $v_\pi$
+\item TD converges faster than MC.
+\end{itemize}
 
-TD methods over MC methods is that they are naturally implemented in an online, fully incremental fashion.
 
-TD converges faster than MC.
 
 \subsection{Optimality of TD(0)}
 
@@ -104,16 +105,18 @@ TD converges faster than MC.
 
 \begin{itemize}
 \item max-likelihood estimate: find the parameter value whose probability of generating the data is greatest
-\item certainty-equivalence estimate: equivalent to assuming that the estimate of the underlying process was known with certainty rather than being approximated
+\item \textbf{certainty-equivalence estimate}: equivalent to assuming that the estimate of the underlying process was known with certainty rather than being approximated
 \end{itemize}
 
-In batch form, TD(0) is faster than MC methods because it computes the true certainty-equivalence estimate.
+In batch form, TD(0) is faster than MC methods because it computes the true certainty-equivalence estimate. In non-batch form, TD(0) may be faster than MC because it is moving toward a better estimate (even if it's not getting all the way there).
+
+!! MC will always find the estimate that minimizes RMSE on train data, whereas batch TD(0) always find the estimate that would be correct for the maximum likelihood model of the Markov process.
+
+Important: look at book examples.
 
 \subsection{Sarsa: On-policy TD control}
 
-This week, you will learn about using temporal difference learning for control, as a generalized policy iteration strategy. You will see three different algorithms based on bootstrapping and Bellman equations for control: Sarsa, Q-learning and Expected Sarsa. You will see some of the differences between the methods for on-policy and off-policy control, and that Expected Sarsa is a unified algorithm for both. You will implement Expected Sarsa and Q-learning, on Cliff World.
-
-We consider transitions from state-action pair to state-action pair.
+We consider transitions from state-action pair to state-action pair. Recall that without a model, for on-policy methods, we must estimate $q(s,a)$; otherwise we need lookahead and a model for $v(s)$.
 
 \begin{definition}
 \textbf{SARSA},
@@ -149,6 +152,8 @@ $\quad$until $S$ is terminal
 
 The reason that SARSA is on-policy is that it updates its Q-values using the Q-value of the next state $S'$ and the current policy's action $A'$. It estimates the return for state-action pairs assuming the current policy continues to be followed.
 
+Convergence properties of SARSA depend on the nature of the policy dependence to $Q$. SARSA converges with probability 1 to an $\pi_*$ and $q_*$ as long as all the state-value pairs are visited an infinite amount of time and the policy converges in the limit to the greedy policy.
+
 \subsection{Q-learning: Off-policy TD control}
 
 \begin{definition}
@@ -171,7 +176,7 @@ $\quad\quad$Choose $A$ from $S$ using policy derived from $Q$ (eg $\epsilon$-gre
 
 $\quad\quad$Take action $A$, observe $R$, $S'$
 
-$\quad\quad Q(S, A) \leftarrow Q(S, A) + \alpha [ R + \gamma max_a Q( S', a) - Q(S, A)]$
+$\quad\quad Q(S, A) \leftarrow Q(S, A) + \alpha [ R + \gamma \max_a Q( S', a) - Q(S, A)]$
 
 $\quad\quad S \leftarrow S'$
 
@@ -184,8 +189,8 @@ The reason that Q-learning is off-policy is that it updates its Q-values using t
 \begin{table}[h!]
 \begin{tabular}{lll}
             & SARSA              & Q-learning         \\ \hline
-Choosing A' & $\pi$ & $\pi$ \\ \hline
-Updating Q  & $\pi$ & $b$    \\ \hline             
+Choosing A' (behavior policy) & $\pi$ & $\pi$ \\ \hline
+Updating Q (target policy) & $\pi$ & $b$    \\ \hline             
 \end{tabular}
 \end{table}
 where $\pi$ is, for example, a $\epsilon$-greedy policy ($\epsilon > 0$ with exploration), and $b$ is a greedy policy (e.g. $\epsilon = 0$, no exploration)
@@ -205,8 +210,11 @@ $$Q(S_t, A_t)\leftarrow Q(S_t, A_t) + \alpha [R_t + \gamma \E_\pi [Q(S_{t+1}, A_
 $$Q(S_t, A_t)\leftarrow Q(S_t, A_t) + \alpha [R_t + \gamma \sum_a \pi(a|S_{t+1})Q(S_{t+1},a) - Q(S_t, A_t)]$$
 \end{definition}
 
-Expected SARSA moves deterministically in the same direction as SARSA moves in expectation.
+Expected SARSA moves \textit{deterministically} in the same direction as SARSA moves \textit{in expectation}.
+
 Expected SARSA is more complex computationally than SARSA, but in return, it eliminates the variance due to the random selection of $A_{t+1}$.
+
+Expected SARSA might use a policy different from the target policy $\pi$ to generate behavior, becoming an off-policy algorithm. If $\pi$ is the greedy policy while behavior is more exploratory, then Expected SARSA is Q-learning.
 
 \subsubsection{TD control and Bellman equations}
 
@@ -223,6 +231,66 @@ $$q_*(s,a) = \sum_{s',r} p(s',r|s,a) (r+\gamma max_{a'} q_* (s',a'))$$
 Q-learning, off-policy, uses the Bellman optimality equation $R + \gamma max_{a'} Q(S_{t+1},a')$, it learns $q_*$.
 
 SARSA can do better than Q-learning when performance is online, because on-policy control methods account for their own exploration.
+
+\subsection{Maximization Bias and Double Learning}
+
+All the control algorithms so far involve maximization in the construction of their target policy:
+\begin{itemize}
+\item in Q-learning, we use the greedy policy given the current action values
+\item in SARSA, the policy is often $\varepsilon$-greedy
+\end{itemize}
+
+\subsubsection{Maximization Bias}
+
+In these algorithms, a max is implicitly used over the estimated values, which can lead to a significant positive bias. To see this, consider a single state $s$ in which for all actions the true value $q(s,a)$ is zero but whose estimated values $Q(s,a)$ are uncertain and thus distributed some above and some below zero. The max will always be positive, when the max over the true values is zero. It's \textit{maximization bias}.
+
+\subsubsection{How to avoid maximization bias: double learning}
+
+One way to view the problem is that it is due to using the \textit{same} samples (plays) both to determine the maximizing action and to estimate its value.
+Suppose we divide the samples into two sets and learn two independent estimates, $Q_1(a)$ and $Q_2(a)$, each an estimate of the true value $q(a)$.
+\begin{itemize}
+\item we use $Q_1$ to determine the maximizing action $A_* = \arg\max_a Q_1(a)$
+\item we use $Q_2$ to provide an estimate of its value $Q_2(A_*) = Q_2 \arg\max_a Q_1(a)$
+\end{itemize}
+This estimate will be unbiased in the sense that $\bE [Q_2(A_*)] = q(A_*)$. We can reverse both to produce another unbiased estimate $Q_1(A_*) = Q_1 \arg\max_a Q_2(a)$ and we have \textbf{double learning}.
+
+\subsubsection{Double Q-learning}
+
+The idea of double learning extends naturally to algorithms for full MDPs. The behavior policy can use both estimates. There are also double versions of SARSA and Expected SARSA.
+
+\begin{tcolorbox}[width=1.1\textwidth,title={Double Q-learning for estimating $Q_1 \approx Q_2 \approx q_*$}]
+Algorithm parameters: step size $\alpha \in (0,1]$, small $\epsilon > 0$
+
+Init $Q_1(s,a)$ and $Q_2(s,a)$, $\forall s \in \S^+$, $a \in \A(s)$, such that that $Q(terminal,\cdot)=0$
+
+Loop for each episode:
+
+$\quad$Init $S$
+
+$\quad$Loop for each step of episode:
+
+$\quad\quad$Choose $A$ from $S$ using the policy $\varepsilon$-greedy in $Q_1 + Q_2$
+
+$\quad\quad$Take action $A$, observe $R$, $S'$
+
+$\quad\quad$With 0.5 probability
+
+$\quad\quad\quad Q_1(S, A) \leftarrow Q_1(S, A) + \alpha [ R + \gamma Q_2( S', \arg\max_a Q_1(S',a) ) - Q_1(S, A)]$
+
+$\quad\quad$else:
+
+$\quad\quad\quad Q_2(S, A) \leftarrow Q_2(S, A) + \alpha [ R + \gamma Q_1( S', \arg\max_a Q_2(S',a) ) - Q_2(S, A)]$
+
+$\quad\quad S \leftarrow S'$
+
+$\quad$until $S$ is terminal
+\end{tcolorbox}
+
+\subsection{Games, afterstates, and Other special cases}
+
+In chapter 1 we presented a TD algorithm for learning Tic-Tac-Toe. It learned something more like a state-value function, but it's neither an action-value nor a state-value in the usual sense. In a conventional state, the player has the option to play actions, but in tic-tac-toe we evaluate after the player has taken the action. It's not an action-value either because we know the state of the game after action is played. Let's call these afterstates and the value functions over these afterstate value-functions.
+
+We can use these to evaluate values more efficiently.
 
 \subsection{Learning Objectives (UA RL MOOC)}
 
@@ -338,7 +406,7 @@ $$Q(S_t, A_t)\leftarrow Q(S_t, A_t) + \alpha [R_t + \gamma \sum_a \pi(a|S_{t+1})
 
 24. Understand how Expected Sarsa compares to Sarsa control
 
-Expected SARSA has a more stable update target than SARSA. In general, Expected SARSA has much lower variance than SARSA (but at a cost of computation)
+Expected SARSA has a more stable update target than SARSA. In general, Expected SARSA has much lower variance than SARSA (but at a cost of computation), as it removes the variance due to the random selection of $A_{t+1}$.
 
 25. Understand how Expected Sarsa can do off-policy learning without using importance sampling
 

@@ -4,7 +4,7 @@
 \newpage
 \section{On-policy Control with Approximation}
 
-In this chapter we move from prediction problem to control problem, now with parametric approximation of the action-value $\hat{q}(s,a,\bm{w})\approx q_*(s,a)$.
+In this chapter we move from prediction problem to control problem, now with parametric approximation of the action-value $\hat{q}(s,a,{\bw})\approx q_*(s,a)$.
 
 We learn the semi-gradient SARSA algorithm as the natural extension of semi-gradient TD(0) to action values and to on-policy control.
 
@@ -12,12 +12,12 @@ Once we have genuine function approximation we have to give up discounting and s
 
 \subsection{Episodic Semi-gradient Control}
 
-From chap 9 $S_t -> U_t$ to chap 10 $S_t, A_t -> U_t$
+From chap 9 $S_t \mapsto U_t$ to chap 10 $S_t, A_t \mapsto U_t$
 
 The general GD update for action-value prediction is
-$$\bm{w}_{t+1} \doteq \bm{w}_t + \alpha[U_t - \hat{q}(S_t, A_t, \bm{w}_t)]\nabla \hat{q}(S_t, A_t, \bm{w}_t)$$
+$${\bw}_{t+1} \doteq {\bw}_t + \alpha[U_t - \hat{q}(S_t, A_t, {\bw}_t)]\nabla \hat{q}(S_t, A_t, {\bw}_t)$$
 Episodic semi-gradient one-step SARSA:
-$$\bm{w}_{t+1} \doteq \bm{w}_t + \alpha[R_{t} + \gamma\hat{q}(S_{t+1}, A_{t+1}, \bm{w}_t) - \hat{q}(S_t, A_t, \bm{w}_t)]\nabla\hat{q}(S_t, A_t, \bm{w}_t)$$
+$${\bw}_{t+1} \doteq {\bw}_t + \alpha[R_{t} + \gamma\hat{q}(S_{t+1}, A_{t+1}, {\bw}_t) - \hat{q}(S_t, A_t, {\bw}_t)]\nabla\hat{q}(S_t, A_t, {\bw}_t)$$
 
 \subsection{Semi-gradient n-step SARSA}
 \subsection{Average Reward: A New Problem Setting for Continuing Tasks}
@@ -33,7 +33,7 @@ r(\pi)&\doteq \lim_{h\to\infty} \frac{1}{h} \sum_{t=1}^h \E[R_t|S_0, A_{0:t-1} \
 &=\lim_{t\to\infty}\E[R_t|S_0, A_{0:t-1} \sim \pi]\\
 &=\sum_s \mu_\pi(s) \sum_a \pi(a|s) \sum_{s',r} p(s',r|s,a)r
 \end{align*}
-Note that the expectation conditioned on initial state $S_0$ and all actions according to $\pi$. The 2nd and 3rd equations hold if the MDP is \textbf{\textit{ergodic}}, that is, the \textit{steady-state distribution} $\mu_\pi(s)\doteq lim_{t\rightarrow\inf}P{S_t=s|A_{0:t-1}\sim\pi}$ exists and is independent of $S_0$.
+Note that the expectation conditioned on initial state $S_0$ and all actions according to $\pi$. The 2nd and 3rd equations hold if the MDP is \textbf{\textit{ergodic}}, that is, the \textit{steady-state distribution} $\mu_\pi(s)\doteq \lim_{t\rightarrow\inf}P\{S_t=s|A_{0:t-1}\sim\pi\}$ exists and is independent of $S_0$.
 In other words, in the long run, the expectation f being in a state depends only on the policy and the MDP transition probabilities (the effect of early decisions is temporary).
 
 The steady state distribution $\mu_\pi$ is the special distribution under which you remain in the same distribution if you select actions according to $\pi$.
@@ -58,11 +58,34 @@ v_*(s)&= max_a \sum{r,s'}p(s',r|s,a)[r-max_\pi r(\pi) + v_*(s')]\\
 q_*(s,a) &= \sum_{r,s'}p(s',r|s,a)[r-max_\pi r(\pi) + max_{a'} q_*(s',a')]
 \end{align*}
 
+\subsection{Deprecating the Discounted Setting}
+
+\begin{itemize}
+\item the discounted setting is useful for the tabular case where the return for each state can be separated and averaged,
+\item and in continuing tasks, we could measure the discounted return at each time step;
+\item however, the average of the discounted rewards is proportional to the average reward, so the ordering of the policies don't change, making discounting useless
+\end{itemize}
+
+The root cause of the difficulties with discounting is that \textit{we lost the policy improvement theorem with function approximation}.
+It is no longer true that if we change the policy to improve the discounted value of one state then we are guaranteed to have improved the overall policy. This lack of theoretical guarantees is an ongoing area of research.
+
+\subsection{Differential Semi-gradient n-step SARSA}
+
+To generalize to $n$-step bootstrapping, we need an $n$-step version of the TD error. $n$-step return:
+$$ G_{t:t+n} = R_{t+1} - \bar{R}_{t+1} + R_{t+1} - \bar{R}_{t+2} + ... + R_{t+n} - \bar{R}_{t+n} + \hat{q}(S_{t+n}, A_{t+n}, \mathbf{w}_{t+n-1}) $$
+
+$\bar{R_t}$ is an estimate of $r(\pi)$, $n \geq 1$ and $t + n < T$.
+If $t + n \geq T$, then we define $G_{t:t+n} = G_t$ as usual.
+
+The $n$-step TD error is then:
+$$ \delta_t = G_{t:t+n} - \hat{q}(S_t, A_t, \bw) $$
+And then we can apply the usual semi-gradient SARSA update.
+
 \subsection{Learning Objectives (UA RL MOOC)}
 Lesson 1: Episodic Sarsa with Function Approximation 
 
 1. Explain the update for Episodic Sarsa with function approximation 
-$$\bm{w}_{t+1} \doteq \bm{w}_t + \alpha[R_{t} + \gamma\hat{q}(S_{t+1}, A_{t+1}, \bm{w}_t) - \hat{q}(S_t, A_t, \bm{w}_t)]\nabla\hat{q}(S_t, A_t, \bm{w}_t)$$
+$${\bw}_{t+1} \doteq {\bw}_t + \alpha[R_{t} + \gamma\hat{q}(S_{t+1}, A_{t+1}, {\bw}_t) - \hat{q}(S_t, A_t, {\bw}_t)]\nabla\hat{q}(S_t, A_t, {\bw}_t)$$
 
 2. Introduce the feature choices, including passing actions to features or stacking state features 
 
@@ -77,9 +100,9 @@ $$\bm{w}_{t+1} \doteq \bm{w}_t + \alpha[R_{t} + \gamma\hat{q}(S_{t+1}, A_{t+1}, 
 4. Discuss how this extends to Q-learning easily, since it is a subset of Expected Sarsa 
 
 Expected SARSA:
-$$\bm{w}_{t+1} \doteq \bm{w}_t + \alpha[R_{t} + \gamma\sum_{a'}\pi(a'|S_{t+1})\hat{q}(S_{t+1}, A_{t+1}, \bm{w}_t) - \hat{q}(S_t, A_t, \bm{w}_t)]\nabla\hat{q}(S_t, A_t, \bm{w}_t)$$
+$${\bw}_{t+1} \doteq {\bw}_t + \alpha[R_{t} + \gamma\sum_{a'}\pi(a'|S_{t+1})\hat{q}(S_{t+1}, A_{t+1}, {\bw}_t) - \hat{q}(S_t, A_t, {\bw}_t)]\nabla\hat{q}(S_t, A_t, {\bw}_t)$$
 Q-learning:
-$$\bm{w}_{t+1} \doteq \bm{w}_t + \alpha[R_{t} + \gamma max_{a'}\hat{q}(S_{t+1}, A_{t+1}, \bm{w}_t) - \hat{q}(S_t, A_t, \bm{w}_t)]\nabla\hat{q}(S_t, A_t, \bm{w}_t)$$
+$${\bw}_{t+1} \doteq {\bw}_t + \alpha[R_{t} + \gamma \max_{a'}\hat{q}(S_{t+1}, A_{t+1}, {\bw}_t) - \hat{q}(S_t, A_t, {\bw}_t)]\nabla\hat{q}(S_t, A_t, {\bw}_t)$$
 
 Lesson 2: Exploration under Function Approximation 
 

@@ -19,9 +19,9 @@
 	\item prediction case: both $\pi$ and $b$ are static and given, we learn either $\hat{v} \approx v_\pi$ or $\hat{q}\approx q_\pi$.
 	\item control case: $\hat{q}$ are learned, $\pi$ and $b$ changes during learning.)
 \end{itemize}
-\item challenges
+\item \textbf{challenges}
 \begin{itemize}
-\item (mismatched) target of the update (solution: importance sampling)
+\item (mismatched) target of the update (solution: semi-gradients, importance sampling)
 \item (mismatched) distribution of the updates, like distribution shift in offline RL? (solution: (1) importance sampling; (2) true gradient methods)
 \end{itemize}
 \end{itemize}
