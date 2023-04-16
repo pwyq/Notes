@@ -37,6 +37,9 @@ Advantages of PG:
 \item policy parameterization is sometimes a good way to impart prior knowledge
 \item action probabilities change smoothly
 \item stronger convergence guarantees for PG than action-value methods
+\begin{itemize}
+	\item because taking the gradient update ensures that the updates are smooth whereas in the action-value selection the max can change the selected action suddenly.
+\end{itemize}
 \end{itemize}
 
 
@@ -85,6 +88,11 @@ $\quad\quad G\leftarrow\sum_{k=t+1}^T \gamma^{k-t-1}R_k$
 $\quad\quad\bm{\theta}\leftarrow\bm{\theta}+\alpha\gamma^t G \nabla ln\pi(A_t | S_t, \bm{\theta})$
 \end{tcolorbox}
 
+\begin{itemize}
+\item good convergence properties (update in the same direction as the performance gradient)
+\item high variance and slow learning
+\end{itemize}
+
 \subsection{REINFORCE with Baseline}
 
 We include an arbitrary baseline $b(s)$ (as long as it doesn't vary with $a$) to (1) strictly generalize REINFORCE; (2) reduce variances w/o introducing bias; (3) dynamically adjust to different states for action selection, (and thus faster learning).
@@ -120,10 +128,13 @@ $\quad\quad \bm{w} \leftarrow \bm{w} + \alpha^{\bm{w}}\delta\nabla\hat{v}(S_t,\b
 $\quad\quad\bm{\theta}\leftarrow\bm{\theta}+\alpha^{\bm{\theta}}\gamma^t \delta \nabla ln\pi(A_t | S_t, \bm{\theta})$
 \end{tcolorbox}
 
+REINFORCE with baseline is unbiased and converge asymptotically to a local minimum but it has a high variance (MC) and thus learns slowly.
+And, it’s inconvenient to use online or in continuing setting).
+
 
 \subsection{Actor-Critic Methods}
 
-\paragraph{why go from baseline methods to AC?} In REINFORCE with baseline, the learned $\hat{v}(s)$ estimates only the first state of each state transition. It is made prior to the transition's action and thus cannot be used to assess that action. In AC methods, the $\hat{v}(s)$ is also applied to the second state of the transition (which forms a one-step return), so we can assessing that action. This way of assessing actions is called a \textit{critic}.
+\paragraph{why go from baseline methods to AC?} In REINFORCE with baseline, the learned $\hat{v}(s)$ estimates only the first state of each state transition. It is made prior to the transition's action and thus cannot be used to assess that action. In AC methods, the $\hat{v}(s)$ is also applied to the second state of the transition (which forms a one-step return; bootstrapping!), so we can assessing that action. This way of assessing actions is called a \textit{critic}.
 
 Note that one-step return introduces bias, but it is often superior to the actual return for lower variance and easier computation. We can fix the bias with n-step returns and eligibility traces.
 
@@ -169,14 +180,14 @@ $\quad\quad I \leftarrow \gamma I$
 $\quad\quad S \leftarrow S'$
 \end{tcolorbox}
 
-AC with Eligibility Traces (episodic) is available in the book. We just declare eligibility trace vectors for both $\bm{\theta}$ and $\bm{w}$, and a trace-decay rates $\lambda$. We decay the the $\gamma$ for both ET vectors at each update.
+AC with Eligibility Traces (episodic) is available in the book. (1) We just declare eligibility trace vectors for both $\bm{\theta}$ and $\bm{w}$, and a trace-decay rates $\lambda$. (2) We replace one-step return $G_{t:t+1}$ with n-step return $G_{t:t+n}$ or $\lambda$-return $G_t^\lambda$. (3) We decay the $\gamma$ for both ET vectors at each update.
 
 \subsection{Policy Gradient for Continuing Problems}
 
 Recall in chap 10.3, we introduce the average reward for continuing problems and a steady-state distribution $\mu(s)$.
 $$\sum_s \mu(s) \sum_a \pi(a|s,\bm{\theta}) p(s'|s,a) = \mu(s')\quad \forall s' \in \S$$
 
-The pseudocode of AC with ET (continuing) is similar to AC with ET (episodic), except that we (1) replace reward with (reward - mean reward), and the mean reward is update as $\overline{R}\leftarrow\overline{R}+\alpha^{\overline{R}}\delta$; (2) remove $\gamma$ decay.
+The pseudocode of AC with ET (continuing) is similar to AC with ET (episodic), except that we (1) replace reward with (reward - mean reward), and the mean reward is update as $\overline{R}\leftarrow\overline{R}+\alpha^{\overline{R}}\delta$; (2) remove $\gamma$ decay; (3) use differential return for value-functions.
 
 \subsection{Policy Parameterization for Continuous Actions}
 

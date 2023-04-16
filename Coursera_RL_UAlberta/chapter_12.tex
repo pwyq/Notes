@@ -5,6 +5,13 @@
 \newpage
 \section{Eligibility Traces}
 
+There are two ways to view eligibility traces. The more theoretical view, which we emphasize here, is that they are a bridge from TD to Monte Carlo methods. When TD methods are augmented with eligibility traces they produce a family of methods spanning a spectrum that has Monte Carlo methods at one end and 1-step TD methods on the other. In between are intermediate methods that are often better than either extreme method. In this sense eligibility traces unify TD and Monte Carlo methods in a valuable and revealing way.
+
+The other way to view eligibility traces is more mechanistic. From this perspective, an eligibility trace is a temporary record of the occurrence of an event, such as the visiting of a state or the taking of an action. The trace marks the memory parameters associated with the event as eligible for undergoing learning changes. When a TD error occurs, only the eligible states or actions are assigned credit or blame for the error. Thus, eligibility traces help bridge the gap between events and training information. Like TD methods themselves, eligibility traces are a basic mechanism for temporal credit assignment.
+
+For reasons that will become apparent shortly, the more theoretical view of eligibility traces is called the forward view, and the more mechanistic view is called the backward view. The forward view is most useful for understanding what is computed by methods using eligibility traces, whereas the backward view is more appropriate for developing intuition about the algorithms themselves. 
+
+\newpage
 \begin{itemize}
 \item Eligibility Traces (ET) is a basic mechanism of RL (in TD($\lambda$) the $\lambda$ refers to the use of ET) 
 \item Almost any TD method (Q-learning, Sarsa), can be combined with ET 
@@ -29,7 +36,7 @@ Advantages of ET over $n$-step methods:
 \item ET is a \textit{backward} view instead of a \textit{forward} view, which is less complex to implement 
 \end{itemize}
 
-\subsection{The lambda return}
+\subsection{The lambda return (n-step return with FA)}
 
  We apply the $n$-step return from chapter 7 to function estimation. The n-step return is the first n rewards + the estimated value of the state reached in n steps, each appropriately discounted: 
 
@@ -49,7 +56,7 @@ G_{t:t+n} = R_{t+1} + \gamma R_{t+2} + ... + \gamma^{n-1} R_{t+n} + \gamma^n \ha
 
 \begin{figure}[h!]
     \centering
-     \includegraphics[width=0.7\textwidth]{td_lambda2.png}
+     \includegraphics[width=0.6\textwidth]{td_lambda2.png}
     \caption{ Backup diagram for TD($\lambda$). $\lambda = 0$ reduces to the first component only (one-step TD), whereas $\lambda = 1$ gives the full MC update. }
 \end{figure}
 
@@ -84,11 +91,11 @@ G_{t:t+n} = R_{t+1} + \gamma R_{t+2} + ... + \gamma^{n-1} R_{t+n} + \gamma^n \ha
 \end{figure}
 
 \newpage
-\subsection{TD-lambda}
+\subsection{TD($\lambda$)}
 
 \begin{itemize}
 \item oldest and most widely used RL algorithms 
-\item first algorithm with a relation between a theoretical forward view and a more practical backward view. The forward view is the “standard” way like n-step, where the update for a state visited at time $t$ depends on the \textit{>future} reward up to $t+n$, which means we have to wait n steps before having enough information to update the “past”. The \textbf{backward} view like ET, maintains the trace vector $\mathbf{z}$ so that the update can be made at the same time. 
+\item first algorithm with a relation between a theoretical forward view and a more practical backward view. The forward view is the “standard” way like n-step, where the update for a state visited at time $t$ depends on the \textit{future} reward up to $t+n$, which means we have to wait n steps before having enough information to update the “past”. The \textbf{backward} view like ET, maintains the trace vector $\mathbf{z}$ so that the update can be made at the same time. 
 \item TD-lambda approximates the off-line $\lambda$-return algorithm of section 12.1, improving it in 3 ways:
     \begin{itemize}
     \item updates the weight vector at every step and not just at the end of the episode 
@@ -107,8 +114,8 @@ G_{t:t+n} = R_{t+1} + \gamma R_{t+2} + ... + \gamma^{n-1} R_{t+n} + \gamma^n \ha
 \begin{align}\mathbf{z}_t = \gamma \lambda \mathbf{z}_{t-1} + \nabla \hat{v}(S_t, \mathbf{w}_t) \quad \quad \quad 0 \leq t \leq T \label{eq:12.4}\tag{12.4}
 \end{align}
 \begin{itemize}
-\item $\gamma$ is the discount rate 
-\item $\lambda$ is the trace-decay parameter 
+\item $\gamma$ is the discount rate, $\lambda$ is the trace-decay parameter 
+\item \ref{eq:12.4} aka accumulating trace
 \end{itemize}
 
  In linear function approximation, the gradient is just the feature vector $\mathbf{x}_t$ in which case the ET vector is just a sum of past, fading, input vector. 
@@ -141,18 +148,17 @@ G_{t:t+n} = R_{t+1} + \gamma R_{t+2} + ... + \gamma^{n-1} R_{t+n} + \gamma^n \ha
 \item in the $\lambda$-return there is a residual weighting given to the true return, here it’s to the longest available n-step return 
 \end{itemize}
 \begin{align}G_{t:h}^{\lambda} = (1 - \lambda) \sum_{n=1}^{h-t-1} \lambda^{n-1} G_{t:t+n} \quad + \quad \lambda^{h-t-1}G_{t:h} \label{eq:12.7}\tag{12.7}\end{align}
-
  We use this return in the update: 
 \begin{align}\mathbf{w}_{t+n} = \mathbf{w}_{t+n-1} + \alpha [G_{t:t+n}^{\lambda} - \hat{v}(S_t, \mathbf{w}_{t+n-1})] \nabla \hat{v}(S_t, \mathbf{w}_{t+n-1}) \label{eq:12.8}\tag{12.8}\end{align}
-
- This can be implemented to start updates at $n-1$ 
-
+ This can be implemented to start updates at $n-1$.
 \begin{figure}[h!]
     \centering
-     \includegraphics[width=0.8\textwidth]{truncated_td.png}
+     \includegraphics[width=0.5\textwidth]{truncated_td.png}
     \caption{Truncated TD}
 \end{figure}
+In $n$-step methods, updates are delayed $n$ steps and only considers the first $n$ rewards; in contrast, now we consider all $k$ ($1 < k < n$) returns in between.
 
+\newpage
 \subsection{Redoing updates: The online lambda-return algorithm}
 
 \begin{itemize}
@@ -201,7 +207,6 @@ h = 3: \quad \quad & \mathbf{w}_1^3 \doteq \mathbf{w}_0^3 + \alpha [G_{0:3}^{\la
     \centering
      \includegraphics[width=0.8\textwidth]{triangle.png}
 \end{figure}
-
 \begin{itemize}
 \item one row is produced at each time step 
 \item turns out that only the weight vectors in the diagonal are really needed 
@@ -227,7 +232,34 @@ h = 3: \quad \quad & \mathbf{w}_1^3 \doteq \mathbf{w}_0^3 + \alpha [G_{0:3}^{\la
     \caption{ True online TD }
 \end{figure}
 
-\subsection{Sarsa-lambda}
+\paragraph{summary}
+\begin{itemize}
+\item accumulating trace (TD($\lambda$)): $\mathbf{z}_t = \gamma \lambda \mathbf{z}_{t-1} + \nabla \hat{v}(S_t, \mathbf{w}_t) \quad 0 \leq t \leq T$
+\begin{itemize}
+	\item can be used for nonlinear FA
+\end{itemize}
+\item dutch trace (True online TD($\lambda$)): $\mathbf{z}_t = \gamma \lambda \mathbf{z}_{t-1} + (1 - \alpha \gamma \lambda \mathbf{z}_{t-1}^{\top} \mathbf{x}_t) \mathbf{x}_t$
+\begin{itemize}
+	\item same memory requirement as accumulating trace
+	\item per-step computation increased about 50\%
+	\item NOT for nonlinear FA
+\end{itemize}
+\item replacing trace: $z_{i,t} = 1$ if $x_{i,t} = 1$, else $\gamma\lambda z_{i,t-1}$
+\begin{itemize}
+	\item only for tabular case, or for binary feature vectors
+	\item crude approx. to dutch trace
+\end{itemize}
+\end{itemize}
+
+\subsection{Dutch Traces in Monte Carlo Learning}
+
+\begin{itemize}
+\item ET has nothing to do with TD, though they are closely associated
+\item ET is not specific to TD, it can also be used in MC
+\item The need for ET arise whenever one tries to learn long-term predictions in an efficient manner
+\end{itemize}
+
+\subsection{Sarsa($\lambda$)}
 
 \begin{itemize}
 \item extend eligibility traces to learn action-values 
@@ -249,17 +281,17 @@ G_{t:t+n} = R_{t+1} + ... + \gamma^{n-1} R_{t+n} + \gamma^n \hat{q}(S_{t+n}, A_{
 \end{itemize}
 \begin{figure}[h!]
     \centering
-     \includegraphics[width=0.8\textwidth]{sarsa_lambda_backup.png}
+     \includegraphics[width=0.3\textwidth]{sarsa_lambda_backup.png}
     \caption{ Sarsa lambda backup }
 \end{figure}
-
+\newpage
 \begin{itemize}
 \item first update: one step, second update: 2 steps, final update: complete return 
 \item the weighting on each n-step return is the same as TD($\lambda$) 
 \end{itemize}
  The backward view of the temporal difference method for action-values, Sarsa($\lambda$), is defined by: 
 \begin{align}
-\mathbf{w}_{t+1} = \mathbf{w}_{t} + \alpha \delta_t, \mathbf{z}_{t}  \label{eq:12.14}\tag{12.14}
+\mathbf{w}_{t+1} = \mathbf{w}_{t} + \alpha \delta_t \mathbf{z}_{t}  \label{eq:12.14}\tag{12.14}
 \end{align}
  Where the TD error is the action-values one: 
 \begin{align}
@@ -275,6 +307,7 @@ G_{t:t+n} = R_{t+1} + ... + \gamma^{n-1} R_{t+n} + \gamma^n \hat{q}(S_{t+n}, A_{
      \includegraphics[width=0.8\textwidth]{sarsa_lambda_binary.png}
     \caption{ Sarsa lambda with binary features }
 \end{figure}
+
  Illustrative example of different methods: 
 \begin{figure}[h!]
     \centering
@@ -285,7 +318,7 @@ G_{t:t+n} = R_{t+1} + ... + \gamma^{n-1} R_{t+n} + \gamma^n \hat{q}(S_{t+n}, A_{
  The Linear function approximation case has an exact $O(d)$ implementation called \textbf{True Online Sarsa($\lambda$)}. 
 
 
-\subsection{Variable lambda and gamma}
+\subsection{Variable $\lambda$ and $\gamma$}
 
 \begin{itemize}
 \item To generalize our TD learning algorithms, we need to generalize the degree of bootstrapping and discounting beyond constant parameters $\lambda$ and $\gamma$ 
@@ -294,11 +327,11 @@ G_{t:t+n} = R_{t+1} + ... + \gamma^{n-1} R_{t+n} + \gamma^n \hat{q}(S_{t+n}, A_{
 
 \paragraph{gamma}
  The function $\gamma$ is a \textbf{termination function} and it now changes the return (the fundamntal Random Variable (RV) whose expectation we seek to estimate) 
-\begin{align}
+\begin{align*}
 G_t & = R_{t+1} + \gamma_{t+1} G_{t+1}\\
  & = R_{t+1} + \gamma_{t+1} R_{t+2} + \gamma_{t+1} \gamma_{t+2} R_{t+3} + ...\\
  & = \sum_{k=t}^{\infty} R_{k+1} \prod_{i=t+1}^k \gamma_i \label{eq:12.17}\tag{12.17}
-\end{align} 
+\end{align*} 
 \begin{itemize}
 \item to ensure the sums are finite, we require that $\prod_{k=t}^{\infty} \gamma_k = 0$ with probability $1$ for all $t$. 
 \item this definition allows to get rid of episodes, a terminal state just becomes a state with $\gamma = 0$ and which transitions to a start state 
@@ -347,9 +380,9 @@ G_t^{\lambda a} = R_{t+1} + \gamma_{t+1} \big( (1 - \lambda_{t+1}) \bar{V}_t(S_{
 
  \textbf{Context} 
 \begin{itemize}
-\item As a reminder, importance sampling $\rho_t = \frac{\pi(A_t|S_t)}{b(A_t|S_t)}$ is a quantity that is used to weight the return obtained using the behaviour policy, to be abl to learn off-policy 
+\item As a reminder, importance sampling $\rho_t = \frac{\pi(A_t|S_t)}{b(A_t|S_t)}$ is a quantity that is used to weight the return obtained using the behaviour policy, to be able to learn off-policy 
 \item It often leads to solution that have a high variance, and are slow to converge 
-\item \textbf{Control variates} aims to reduce the variance of the initial estimator (which includes $\rho$), by substracting a baseline that has $0$ expectation. 
+\item \textbf{Control variates} aims to reduce the variance of the initial estimator (which includes $\rho$), by subtracting a baseline that has $0$ expectation. 
 \item \textbf{Per decision} importance sampling with control variates was introduced in chap 7.4, and here we develop the bootstrapping version of it: 
 \end{itemize}
 
@@ -460,7 +493,6 @@ Trace update involving target-policy probabilities of the selected actions:
 \end{align}
 
  We can combine this to the usual parameter update rule \ref{eq:12.6} to get the TB($\lambda$) algorithm: 
-
 \begin{align}\mathbf{w}_{t+1} = \mathbf{w}_t + \alpha \delta_t \mathbf{z}_t\end{align}
 
 \subsection{Stable off-policy methods with traces}
