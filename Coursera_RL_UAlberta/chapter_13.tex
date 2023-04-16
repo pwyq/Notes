@@ -28,7 +28,7 @@ In PG methods, policy can be parameterized in any way, as long as the policy $\p
 \textbf{soft-max in action preferences}: action preference $h(s,a,\bm{\theta})$ can be parameterized arbitrarily.
 $$ \pi(a|s,\bm{\theta}) \doteq \frac{e^{h(s,a,\bm{\theta})}}{\sum_b e^h(s,b,\bm{\theta})}$$
 \end{definition}
-For example, the preference can be linear $h(s,a,\bm{\theta}) = \bm{\theta}^T \bm{x}(s,a)$
+For example, the preference can be linear $h(s,a,\bm{\theta}) = \bm{\theta}^T {\bx}(s,a)$
 
 Advantages of PG:
 \begin{itemize}
@@ -102,16 +102,16 @@ Therefore, the update rule is
 \bm{\theta_{t+1}} &\doteq \bm{\theta_t} + \alpha (G_t - b(S_t)) \frac{\nabla\pi(A_t|S_t,\bm{\theta_t})}{\pi(A_t|S_t,\bm{\theta_t})} \\
 &= \bm{\theta} + \alpha (G_t - b(S_t)) \nabla ln \pi(A_t|S_t, \bm{\theta})
 \end{align*}
-A natural choice for the baseline is an estimate of the state value, $\hat{v}(S_t, \bm{w})$.
+A natural choice for the baseline is an estimate of the state value, $\hat{v}(S_t, {\bw})$.
 
 \begin{tcolorbox}[width=1.1\textwidth,title={REINFORCE with baseline (episodic) for estimating $\pi_*$}]
 Input: a differentiable policy parameterization $\pi(a|s,\bm{\theta})$
 
-Input: a differentiable state-value function parameterization $\hat{v}(s,\bm{w})$
+Input: a differentiable state-value function parameterization $\hat{v}(s,{\bw})$
 
-Algorithm parameter: step size $\alpha^{\bm{\theta}} > 0, \alpha^{\bm{w}} > 0$
+Algorithm parameter: step size $\alpha^{\bm{\theta}} > 0, \alpha^{{\bw}} > 0$
 
-Initialize policy parameter $\bm{\theta} \in \R^{d'}$ and state-value weight $\bm{w} \in \R^d$
+Initialize policy parameter $\bm{\theta} \in \R^{d'}$ and state-value weight ${\bw} \in \R^d$
 
 Loop forever (for each episode):
 
@@ -121,9 +121,9 @@ $\quad$Loop for each step of the episode $t=0,1,...,T-1$:
 
 $\quad\quad G\leftarrow\sum_{k=t+1}^T \gamma^{k-t-1}R_k$
 
-$\quad\quad \delta\leftarrow G - \hat{v}(S_t, \bm{w})$
+$\quad\quad \delta\leftarrow G - \hat{v}(S_t, {\bw})$
 
-$\quad\quad \bm{w} \leftarrow \bm{w} + \alpha^{\bm{w}}\delta\nabla\hat{v}(S_t,\bm{w})$
+$\quad\quad {\bw} \leftarrow {\bw} + \alpha^{{\bw}}\delta\nabla\hat{v}(S_t,{\bw})$
 
 $\quad\quad\bm{\theta}\leftarrow\bm{\theta}+\alpha^{\bm{\theta}}\gamma^t \delta \nabla ln\pi(A_t | S_t, \bm{\theta})$
 \end{tcolorbox}
@@ -141,8 +141,8 @@ Note that one-step return introduces bias, but it is often superior to the actua
 \begin{definition}
 \textbf{one-step AC} replace the full return of REINFORCE with the one-step return. The baseline of REINFORCE may be a $\hat{v}(s)$, but AC must use $\hat{v}(s)$ as the baseline.
 \begin{align*}
-\bm{\theta_{t+1}} &\doteq \bm{\theta_t} + \alpha (\underbrace{G_{t:t+1}}_{\text{one-step return}} - \hat{v}(S_t, \bm{w})) \frac{\nabla\pi(A_t|S_t,\bm{\theta_t})}{\pi(A_t|S_t,\bm{\theta_t})} \\
-&= \bm{\theta_t} + \alpha (R_{t+1} + \gamma\hat{v}(S_{t+1},\bm{w}) - \hat{v}(S_t, \bm{w})) \frac{\nabla\pi(A_t|S_t,\bm{\theta_t})}{\pi(A_t|S_t,\bm{\theta_t})} \\
+\bm{\theta_{t+1}} &\doteq \bm{\theta_t} + \alpha (\underbrace{G_{t:t+1}}_{\text{one-step return}} - \hat{v}(S_t, {\bw})) \frac{\nabla\pi(A_t|S_t,\bm{\theta_t})}{\pi(A_t|S_t,\bm{\theta_t})} \\
+&= \bm{\theta_t} + \alpha (R_{t+1} + \gamma\hat{v}(S_{t+1},{\bw}) - \hat{v}(S_t, {\bw})) \frac{\nabla\pi(A_t|S_t,\bm{\theta_t})}{\pi(A_t|S_t,\bm{\theta_t})} \\
 \end{align*}
 \end{definition}
 
@@ -151,11 +151,11 @@ Since we are using one-step return, the one-step AC is full online and increment
 \begin{tcolorbox}[width=1.1\textwidth,title={One-step Actor-Critic (episodic), for estimating $\pi_\theta\approx\pi_*$}]
 Input: a differentiable policy parameterization $\pi(a|s,\bm{\theta})$
 
-Input: a differentiable state-value function parameterization $\hat{v}(s,\bm{w})$
+Input: a differentiable state-value function parameterization $\hat{v}(s,{\bw})$
 
-Algorithm parameter: step size $\alpha^{\bm{\theta}} > 0, \alpha^{\bm{w}} > 0$
+Algorithm parameter: step size $\alpha^{\bm{\theta}} > 0, \alpha^{{\bw}} > 0$
 
-Initialize policy parameter $\bm{\theta} \in \R^{d'}$ and state-value weight $\bm{w} \in \R^d$
+Initialize policy parameter $\bm{\theta} \in \R^{d'}$ and state-value weight ${\bw} \in \R^d$
 
 Loop forever (for each episode):
 
@@ -169,9 +169,9 @@ $\quad\quad A \sim \pi(\cdot | S, \theta)$
 
 $\quad\quad$Take action $A$, observe $S', R$
 
-$\quad\quad \delta\leftarrow R + \hat{v}(S_{t+1},\bm{w}) - \hat{v}(S_t, \bm{w})$
+$\quad\quad \delta\leftarrow R + \hat{v}(S_{t+1},{\bw}) - \hat{v}(S_t, {\bw})$
 
-$\quad\quad \bm{w} \leftarrow \bm{w} + \alpha^{\bm{w}}\delta\nabla\hat{v}(S_t,\bm{w})$
+$\quad\quad {\bw} \leftarrow {\bw} + \alpha^{{\bw}}\delta\nabla\hat{v}(S_t,{\bw})$
 
 $\quad\quad\bm{\theta}\leftarrow\bm{\theta}+\alpha^{\bm{\theta}} I \delta \nabla ln\pi(A_t | S_t, \bm{\theta})$
 
@@ -180,12 +180,12 @@ $\quad\quad I \leftarrow \gamma I$
 $\quad\quad S \leftarrow S'$
 \end{tcolorbox}
 
-AC with Eligibility Traces (episodic) is available in the book. (1) We just declare eligibility trace vectors for both $\bm{\theta}$ and $\bm{w}$, and a trace-decay rates $\lambda$. (2) We replace one-step return $G_{t:t+1}$ with n-step return $G_{t:t+n}$ or $\lambda$-return $G_t^\lambda$. (3) We decay the $\gamma$ for both ET vectors at each update.
+AC with Eligibility Traces (episodic) is available in the book. (1) We just declare eligibility trace vectors for both $\bm{\theta}$ and ${\bw}$, and a trace-decay rates $\lambda$. (2) We replace one-step return $G_{t:t+1}$ with n-step return $G_{t:t+n}$ or $\lambda$-return $G_t^\lambda$. (3) We decay the $\gamma$ for both ET vectors at each update.
 
 \subsection{Policy Gradient for Continuing Problems}
 
 Recall in chap 10.3, we introduce the average reward for continuing problems and a steady-state distribution $\mu(s)$.
-$$\sum_s \mu(s) \sum_a \pi(a|s,\bm{\theta}) p(s'|s,a) = \mu(s')\quad \forall s' \in \S$$
+$$\sum_s \mu(s) \sum_a \pi(a|s,\bm{\theta}) p(s'|s,a) = \mu(s')\quad \forall s' \in \cS$$
 
 The pseudocode of AC with ET (continuing) is similar to AC with ET (episodic), except that we (1) replace reward with (reward - mean reward), and the mean reward is update as $\overline{R}\leftarrow\overline{R}+\alpha^{\overline{R}}\delta$; (2) remove $\gamma$ decay; (3) use differential return for value-functions.
 
@@ -198,8 +198,8 @@ $$p(s)\doteq\frac{1}{\sigma\sqrt{2\pi}}exp(-\frac{(x-\mu)^2}{2\sigma^2})$$
 To use PDF in policy parameterization
 $$\pi(a|s,\bm{\theta}) \doteq\frac{1}{\sigma(s,\bm{\theta}) \sqrt{2\pi}}exp(-\frac{(a -\mu(s,\bm{\theta}))^2}{2\sigma(s,\bm{\theta})^2})$$
 where we often declare that
-$$\mu(s,\bm{\theta})\doteq \bm{\theta}_\mu^T \bm{x}_\mu (s)$$
-$$\sigma(s,\bm{\theta}) \doteq exp(\bm{\theta}_\sigma^T \bm{x}_\sigma(s)) > 0$$
+$$\mu(s,\bm{\theta})\doteq \bm{\theta}_\mu^T {\bx}_\mu (s)$$
+$$\sigma(s,\bm{\theta}) \doteq exp(\bm{\theta}_\sigma^T {\bx}_\sigma(s)) > 0$$
 
 \subsection{Summary}
 
@@ -224,12 +224,12 @@ Lesson 1: Learning Parameterized Policies
 
 1. Understand how to define policies as parameterized functions 
 
-Parameterized policy: $\pi(a|s,\bm{\theta})$. Parameterized value function: $\hat{q}(s,a,\bm{w})$
+Parameterized policy: $\pi(a|s,\bm{\theta})$. Parameterized value function: $\hat{q}(s,a,{\bw})$
 
 Constraints on the policy parameterization
 \begin{itemize}
-\item $\pi(a|s,\bm{\theta}) \geq 0 \quad \forall a \in \A, s \in \S$
-\item $\sum_{a\in\A} \pi(a|s,\bm{\theta}) = 1 \quad \forall s \in \S$
+\item $\pi(a|s,\bm{\theta}) \geq 0 \quad \forall a \in \A, s \in \cS$
+\item $\sum_{a\in\A} \pi(a|s,\bm{\theta}) = 1 \quad \forall s \in \cS$
 \end{itemize}
 
 2. Define one class of parameterized policies based on the softmax function 
@@ -285,17 +285,17 @@ Full algorithm see chap 13.6
 \item critic: value functions, evaluating the actions selected by the actor
 \end{itemize}
 In the update rule, we don't have access to $q_\pi$, so we have to approximate it. For example, one-step bootstrap return TD method:
-$$q_\pi(s,a) = R_{t+1} - \overline{R}+\hat{v}(S_{t+1}, \bm{w}) $$.
+$$q_\pi(s,a) = R_{t+1} - \overline{R}+\hat{v}(S_{t+1}, {\bw}) $$.
 To further improve, we subtract a baseline to reduces the update variance (results in faster learning):
-$$q_\pi(s,a) = R_{t+1} - \overline{R}+\hat{v}(S_{t+1}, \bm{w}) - \hat{v}(S_t, \bm{w}) $$.
+$$q_\pi(s,a) = R_{t+1} - \overline{R}+\hat{v}(S_{t+1}, {\bw}) - \hat{v}(S_t, {\bw}) $$.
 Note this is equals the TD error $\delta$.
 
 Lesson 4: Policy Parameterizations 
 
 9. Derive the actor-critic update for a softmax policy with linear action preferences 
 \begin{align*}
-\bm{w} &= \bm{w} + \alpha^{\bm{w}} \delta \underbrace{\nabla\hat{v}(S,\bm{w})}_{\bm{x}(s)} \quad \text{just like semi-gradient TD}\\
-\bm{\theta} &= \bm{\theta} + \alpha^{\bm{\theta}}\delta \underbrace{\nabla ln \pi(A|S,\bm{\theta})}_{ \bm{x}_h(s,a) - \sum_b \pi(b|s, \bm{\theta})x_h(s,b) }
+{\bw} &= {\bw} + \alpha^{{\bw}} \delta \underbrace{\nabla\hat{v}(S,{\bw})}_{{\bx}(s)} \quad \text{just like semi-gradient TD}\\
+\bm{\theta} &= \bm{\theta} + \alpha^{\bm{\theta}}\delta \underbrace{\nabla ln \pi(A|S,\bm{\theta})}_{ {\bx}_h(s,a) - \sum_b \pi(b|s, \bm{\theta})x_h(s,b) }
 \end{align*}
 
 10. Implement this algorithm 
@@ -317,10 +317,10 @@ $\mu(s,\bm{\theta})$ can be any parameterized function.
 $\sigma$ controls the degree of exploration; usually initialized to be large s.t a wide range of actions are tried. As learning process, we expect the variance to shrink and the policy to concentrate around the best action in each state. The agent can reduce the amount of exploration through learning.
 
 For $\theta$,
-$$\nabla ln\pi(a|s, \bm{\theta}_\mu) = \frac{1}{\sigma(s,\bm{\theta})^2}(a-\mu(s,\bm{\theta}))\bm{x}(s)$$
+$$\nabla ln\pi(a|s, \bm{\theta}_\mu) = \frac{1}{\sigma(s,\bm{\theta})^2}(a-\mu(s,\bm{\theta})){\bx}(s)$$
 
 For $\sigma$,
-$$\nabla ln\pi(a|s, \bm{\theta}_\sigma) = (\frac{( a- \mu(s,\bm{\theta}) )^2}{\sigma(s,\bm{\theta})^2} - 1) \bm{x}(s)$$
+$$\nabla ln\pi(a|s, \bm{\theta}_\sigma) = (\frac{( a- \mu(s,\bm{\theta}) )^2}{\sigma(s,\bm{\theta})^2} - 1) {\bx}(s)$$
 
 Advantages of Continuous Actions
 \begin{itemize}

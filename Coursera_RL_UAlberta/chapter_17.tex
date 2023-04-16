@@ -7,8 +7,108 @@
 
 \subsection{General Value Functions and Auxiliary Tasks}
 
+value-function
+\begin{itemize}
+\item conditional on an arbitrary target policy $\rightarrow$ off-policy learning
+\item generalize discounting to a \textit{termination function} $\gamma$, s.t. different rate is used at each step (allows prediction on rewards on arbitrary, state-dependent horizon)
+\item NOW: generalize rewards to other signals.
+\end{itemize}
+
+\begin{definition}
+\textbf{cumulant} of prediction: sum of future values of signals (may be reward, sound etc)
+\end{definition}
+\begin{definition}
+\textbf{General Value Function (GVF)}: computes the GVF w.r.t cumulant signal $C_t \in \bR$. A more proper name is General Prediction Function as it not necessary uses rewards.
+\end{definition}
+$$ v_{\pi, \gamma, C}(s) \doteq \bE \Big[ \sum_{k=t}^\infty \Big( \prod_{i=t+1}^k \gamma (S_i) \Big) C_{k+1} | S_t = s, A_{t:\infty} \approx \pi \Big] $$
+GVF can still be learned using the methods like conventional value functions.
+
+\paragraph{why predict other signals?} Other signals (than reward) are \textit{auxiliary tasks}. The main task is to maximizing reward.
+
+Learning a diverse multitude of signals can constitute a powerful model, thus accelerate learning or make learning more efficient (recall Dyna).
+
+Example, an ANN. The last layer of ANN can be used to learn multiple signals, and all of them backprop errors (SGD) to the body.
+
 \subsection{Temporal Abstraction via Options}
 
+Think: can a single MDP be used for different scale of tasks? Can a MDP be stretched to cover all levels simultaneously?
+
+Idea: formalize MDP at a detailed level (small timesteps), and enable planning at higher levels.
+\begin{definition}
+\textbf{option} $w = \langle \pi_w, \gamma_w \rangle$, a pair of a policy $\pi$ and a state-dependent termination function $\gamma$.
+
+To execute $w$, at time $t$: obtain $A_t$ from $\pi_w(\cdot | S_t)$, then terminate at $t+1$ with probability $(1 - \gamma_w (S_{t+1}))$; if not terminate, we repeat the process to future timesteps until termination.
+\end{definition}
+An action $a$ is like an option whose policy picks $a$ and whose termination function = 0.
+
+Advantages of options:
+\begin{itemize}
+\item effectively extend the action space
+\item interchangable with low-level actions
+\item extends policy to \textit{hierarchical policy}
+\end{itemize}
+
+\paragraph{option models}
+$$ r(s, w) \doteq \bE [ R_1 + \gamma R_2 + \gamma^2 R_3 + \cdots + \gamma^{\tau - 1} R_\tau | S_0 = s, A_{0:\tau - 1} \approx \pi_w, \tau \approx \gamma_w ] $$
+where $\tau$ is the random time step when the option terminates based on $\gamma_w$. Note: distinguish discount factor $\gamma$ and termination function $\gamma_w$.
+
+$$ p(s'|s,w) \doteq \sum_{k=1}^\infty \gamma^k Pr\{ S_k = s', \tau = k | S_0 = s, A_{0:k-1} \approx \pi_w, \tau \approx \gamma_w \} $$
+Note that the sum of $p(s'|s,w)$ is NOT 1 over all $s'$, because of $\gamma^k$.
+
+$$ v_\pi(s) = \sum_a \pi(a|s) \sum_{s',r} p(s',r|s,a) [ r + \gamma v_\pi(s) ] $$
+$$ v_\pi(s) = \sum_{w \in \Omega(s)} \pi(w|s) [ r(s,w) + \sum_{s'} p(s'|s,w)v_\pi(s')] $$
+where $\Omega(s)$ = set of options in $s$. Note that the $p$ is inside the bracket for the option models.
+
+
 \subsection{Observation and State}
+
+In part I of the book, tabular case is limited to partial observable states.
+
+In part II of the book, FA works in POMDP with parametric generalization of states.
+
+Now to investigate partial observability, there are four steps:
+\paragraph{1. observation} let the environment emits \textit{observations}, instead of states. Observations contains partial info of states.
+
+\paragraph{2. history}
+History $H_t \doteq A_0, O_1, \dots, A_{t-1}, O_{t-1}$. 
+
+State now become a function of history, $S_t = f(H_t)$. State is informationally perfect, as it summarize all information about the history. In this case, $S_t$ and $f$ have Markov property (i.e., the future only depends on the current state, not the history).
+
+\textit{test} $\tau$ is a specific sequence of alternating actions and observations that might occur in the future. For example, a two-step test $\tau = a_1o_1a_2o_2$.
+The probability of this test given a specific history $h$ is:
+$$ p(\tau | h) \doteq Pr\{O_{t+1} = o_1, O_{t+2} = o_2 | H_t = h, A_t = a1, A_{t+1} = a_2\} $$
+Formally, $f$ is Markov iff, for any $\tau$ and $h$ and $h'$ that map to the same state under $f$, the test's probabilities given the two histories are equal:
+$$ f(h) = f(h') \Rightarrow p(\tau | h) = p(\tau | h') \quad \forall h,h',\tau \in \{ \cA \times \cO \}^* $$
+
+\paragraph{3. computational considerations}
+The Markov state should be compact, smaller than the history.
+We also want incremental, recursive update.
+$$ S_{t+1} \doteq u(S_t, A_t, O_{t+1}) \forall t \geq 0 $$
+where $u$ is \textbf{\textit{state-update function}}.
+
+A state-update function is a central part of any agent architecture that handles partial observability (see Figure 17.1).
+
+Three ways to find a Markov state
+\begin{itemize}
+\item through one-step predictions. But in practice, error often compounds, thus predictions will be inaccurate
+\item through POMDP. But in practice, this approach scales poorly.
+\begin{itemize}
+	\item Markov state $S_t$ (aka \textit{belief state}) in POMDP is the \textit{distribution} over the latent states given the history
+	\item latent state $X_t$: hidden to agent, but can produces environment's observations
+	\item Markov state $s_t \doteq Pr\{ X_t = i | H_t \}$ given all possible latent states $i \in \{1,2,\dots,d\}$
+\end{itemize}
+\item through Predictive State Representations (PSRs)
+\begin{itemize}
+	\item in POMDP, $X_t$ is unobservable; in PSRs, $X_t$ is observable.
+	\item in PSRs, a Markov state is a $d$-vector of the probabilities of $d$ specially chosen tests $\tau$s
+\end{itemize}
+\end{itemize}
+
+\paragraph{4. re-introduce approximation}
+
+\begin{itemize}
+\item approximation matters!
+\item short-term vs. long-term approximation of history $h_t$
+\end{itemize}
 
 \end{document}

@@ -576,7 +576,7 @@ Lesson 2: The Objective for On-policy Prediction
 10. Understand the mean-squared value error objective for policy evaluation 
 
 We cannot guarantee perfect approximation for every state's value, so we need to define an objective, a measure of the distance between our approximation and the true values.
-$$\overline{VE}({\bw}) \doteq \sum_{s\in\S} \underbrace{\mu(s)}_{\text{weight}} \underbrace{[v_\pi(s) - \hat{v}(s,{\bw})]^2}_{\text{error}}$$
+$$\overline{VE}({\bw}) \doteq \sum_{s\in\cS} \underbrace{\mu(s)}_{\text{weight}} \underbrace{[v_\pi(s) - \hat{v}(s,{\bw})]^2}_{\text{error}}$$
 
 11. Explain the role of the state distribution in the objective 
 

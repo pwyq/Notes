@@ -23,7 +23,7 @@ $${\bw}_{t+1} \doteq {\bw}_t + \alpha[R_{t} + \gamma\hat{q}(S_{t+1}, A_{t+1}, {\
 \subsection{Average Reward: A New Problem Setting for Continuing Tasks}
 Episodic, discounted, average reward (New!)
 
-\paragraph{why average reward} In discounted setting, the only way to ensure the agents actions maximize reward over time is to keep increasing discount factor $\gamma$ towards 1 (see the LeftRight8ring example). The $\gamma$ can't be 1; otherwise, the return will be infinite. Moreover, larger $\gamma$ can result in larger and more variables sums (longer time horizon $\to$ larger discount factor $\to$ wider the range of return $\to$ larger variance), which might be hard to learn. So we introduce a new setting: average reward.
+\paragraph{why average reward} In discounted setting, the only way to ensure the agent's actions maximize reward over time is to keep increasing discount factor $\gamma$ towards 1 (see the LeftRight8ring example). The $\gamma$ can't be 1; otherwise, the return will be infinite. Moreover, larger $\gamma$ can result in larger and more variables sums (longer time horizon $\to$ larger discount factor $\to$ wider the range of return $\to$ larger variance), which might be hard to learn. So we introduce a new setting: average reward.
 
 \begin{definition}
 \textbf{average reward $r(\pi)$}, no discounting considered, the agent cares the same for delayed rewards and immediate rewards. It defines the quality of a policy $\pi$.

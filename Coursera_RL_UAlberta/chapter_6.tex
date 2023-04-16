@@ -129,7 +129,7 @@ Since the update rule uses every element of the quintuple of events, $$(S_t, A_t
 \begin{tcolorbox}[width=1.1\textwidth,title={SARSA (on-policy TD control} for estimating $Q\approx q_*$]
 Algorithm parameters: step size $\alpha \in (0,1]$, small $\epsilon > 0$
 
-Init $Q(s,a)$, $\forall s \in \S^+$, $a \in \A(s)$, arbitrarily except that $Q(terminal,\cdot)=0$
+Init $Q(s,a)$, $\forall s \in {\cS}^+$, $a \in \A(s)$, arbitrarily except that $Q(terminal,\cdot)=0$
 
 Loop for each episode:
 
@@ -164,7 +164,7 @@ $$Q(S_t,A_t)\leftarrow Q(S_t, A_t)+\alpha [R + \gamma max_a Q(S_{t+1}, a) - Q(S_
 \begin{tcolorbox}[width=1.1\textwidth,title={Q-learning (off-policy TD control) for estimating $\pi\approx \pi_*$}]
 Algorithm parameters: step size $\alpha \in (0,1]$, small $\epsilon > 0$
 
-Init $Q(s,a)$, $\forall s \in \S^+$, $a \in \A(s)$, arbitrarily except that $Q(terminal,\cdot)=0$
+Init $Q(s,a)$, $\forall s \in {\cS}^+$, $a \in \A(s)$, arbitrarily except that $Q(terminal,\cdot)=0$
 
 Loop for each episode:
 
@@ -261,7 +261,7 @@ The idea of double learning extends naturally to algorithms for full MDPs. The b
 \begin{tcolorbox}[width=1.1\textwidth,title={Double Q-learning for estimating $Q_1 \approx Q_2 \approx q_*$}]
 Algorithm parameters: step size $\alpha \in (0,1]$, small $\epsilon > 0$
 
-Init $Q_1(s,a)$ and $Q_2(s,a)$, $\forall s \in \S^+$, $a \in \A(s)$, such that that $Q(terminal,\cdot)=0$
+Init $Q_1(s,a)$ and $Q_2(s,a)$, $\forall s \in {\cS}^+$, $a \in \A(s)$, such that that $Q(terminal,\cdot)=0$
 
 Loop for each episode:
 
