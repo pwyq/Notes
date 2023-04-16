@@ -63,7 +63,7 @@ q_*(s,a) &= \sum_{r,s'}p(s',r|s,a)[r-max_\pi r(\pi) + max_{a'} q_*(s',a')]
 \begin{itemize}
 \item the discounted setting is useful for the tabular case where the return for each state can be separated and averaged,
 \item and in continuing tasks, we could measure the discounted return at each time step;
-\item however, the average of the discounted rewards is proportional to the average reward, so the ordering of the policies don't change, making discounting useless
+\item however, the average of the discounted rewards is proportional to the average reward, so the ordering of the policies doesn't change, making discounting useless
 \end{itemize}
 
 The root cause of the difficulties with discounting is that \textit{we lost the policy improvement theorem with function approximation}.
